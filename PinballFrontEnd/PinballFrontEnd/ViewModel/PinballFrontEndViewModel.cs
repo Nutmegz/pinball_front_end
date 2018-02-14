@@ -24,6 +24,7 @@ namespace PinballFrontEnd.ViewModel
         public ICommand NextVideoFile { get { return new RelayCommand(NVF); } }
 
 
+        //Default Constructor
         public PinballFrontEndViewModel()
         {
             

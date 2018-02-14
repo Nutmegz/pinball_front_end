@@ -76,12 +76,13 @@
     <Compile Include="Model\PinballTable.cs" />
     <Compile Include="ViewModel\PinballFrontEndViewModel.cs" />
     <Compile Include="ViewModel\RelayCommand.cs" />
+    <Compile Include="ViewModel\TableManagerViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Compile Include="View\PinballFrontEndView.xaml.cs">
       <DependentUpon>PinballFrontEndView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\TableManager.xaml.cs">
-      <DependentUpon>TableManager.xaml</DependentUpon>
+    <Compile Include="View\TableManagerView.xaml.cs">
+      <DependentUpon>TableManagerView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -123,7 +124,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\TableManager.xaml">
+    <Page Include="View\TableManagerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

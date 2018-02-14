@@ -15,13 +15,17 @@ using System.Windows.Shapes;
 namespace PinballFrontEnd.View
 {
     /// <summary>
-    /// Interaction logic for TableManager.xaml
+    /// Interaction logic for TableManagerView.xaml
     /// </summary>
-    public partial class TableManager : Window
+    public partial class TableManagerView : Window
     {
-        public TableManager()
+        public TableManagerView()
         {
             InitializeComponent();
+
+            var viewModel = new PinballFrontEnd.ViewModel.TableManagerViewModel();
+            this.DataContext = viewModel;
+
         }
     }
 }

@@ -19,5 +19,10 @@ namespace PinballFrontEnd.Model
         public bool HideBackglass { get; set; } = true;
         public bool Enabled { get; set; } = true;
 
+        //Media File Names
+        public string Playfield { get; set; } = "";
+        public string Backglass { get; set; } = "";
+        public string DMD { get; set; } = "";
+
     }
 }
