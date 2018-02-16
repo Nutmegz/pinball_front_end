@@ -20,9 +20,10 @@ namespace PinballFrontEnd.Model
         public bool Enabled { get; set; } = true;
 
         //Media File Names
-        public string Playfield { get; set; } = "";
-        public string Backglass { get; set; } = "";
-        public string DMD { get; set; } = "";
+        public Uri Playfield { get; set; } = null;
+        public Uri Backglass { get; set; } = null;
+        public Uri DMD { get; set; } = null;
+        public Uri Wheel { get; set; } = null;
 
     }
 }

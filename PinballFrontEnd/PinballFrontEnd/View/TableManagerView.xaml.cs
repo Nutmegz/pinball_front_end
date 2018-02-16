@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.IO;
 
 namespace PinballFrontEnd.View
 {
@@ -27,5 +28,27 @@ namespace PinballFrontEnd.View
             this.DataContext = viewModel;
 
         }
+
+        private void PlayfieldMediaRepeat(object sender, RoutedEventArgs e)
+        {
+            PlayfieldMedia.Position = TimeSpan.Zero;
+            PlayfieldMedia.Play();
+        }
+        private void BackglassMediaRepeat(object sender, RoutedEventArgs e)
+        {
+            BackglassMedia.Position = TimeSpan.Zero;
+            BackglassMedia.Play();
+        }
+        private void DMDMediaRepeat(object sender, RoutedEventArgs e)
+        {
+            DMDMedia.Position = TimeSpan.Zero;
+            DMDMedia.Play();
+        }
+        private void WheelMediaRepeat(object sender, RoutedEventArgs e)
+        {
+            WheelMedia.Position = TimeSpan.Zero;
+            WheelMedia.Play();
+        }
+
     }
 }

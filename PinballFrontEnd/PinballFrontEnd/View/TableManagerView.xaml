@@ -5,57 +5,132 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PinballFrontEnd.View"
         mc:Ignorable="d"
-        Title="TableManagerView" Height="300" Width="800">
+        Title="Pinball Front End - Table Monitor" Height="1080" Width="1920">
 
     <Window.Resources>
+
+
+        <Thickness x:Key="CommonMargin" Left="6" Right="6" Top="6" Bottom="6" />
+
         <Style TargetType="Button">
             <Setter Property="FontSize" Value="20" />
+            <Setter Property="Margin" Value="{StaticResource CommonMargin}" />
         </Style>
         <Style TargetType="DataGrid">
             <Setter Property="FontSize" Value="20" />
+            <Setter Property="Margin" Value="{StaticResource CommonMargin}" />
         </Style>
+
+        <Style TargetType="MediaElement">
+            <Setter Property="Margin" Value="{StaticResource CommonMargin}" />
+        </Style>
+
+
     </Window.Resources>
-    
+
     <Grid>
-        <Grid>
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            
-            <Button Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="10"  Command="{Binding SaveTableList}" Content="Save Table Database" />
-            <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="10" Command="{Binding OpenTableList}" Content="Open Table Database" />
-            
-            <!-- Grid to show main table data-->
-            <DataGrid x:Name="tableDataGrid" Grid.Row="2" Grid.Column="0" Grid.RowSpan="3" ItemsSource="{Binding TableList, Mode=TwoWay}" AutoGenerateColumns="True">
-                <!--<DataGrid.Columns>
-                    <DataGridTextColumn Header="Table Name" Binding="{Binding Name}" />
-                    <DataGridTextColumn Header="Playfield" Binding="{Binding Playfield}" />
-                </DataGrid.Columns>-->
-            </DataGrid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" MinHeight="50" />
+            <RowDefinition Height="Auto" MinHeight="50"/>
+            <RowDefinition Height="Auto" MinHeight="50" />
+            <RowDefinition Height="*" MinHeight="50"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-            <MediaElement Grid.Row="2" Grid.Column="1" Grid.RowSpan="3" UnloadedBehavior="Close" LoadedBehavior="Play" ScrubbingEnabled="True" IsMuted="True" Source="{Binding SelectedItem.Playfield, ElementName=tableDataGrid}">
-                <MediaElement.LayoutTransform>
-                    <RotateTransform Angle="-90" />
-                </MediaElement.LayoutTransform>
-            </MediaElement>
+        <Button 
+                Grid.Row="0" 
+                Grid.Column="0" 
+                Grid.ColumnSpan="10"  
+                Command="{Binding SaveTableList}" 
+                Content="Save Table Database" />
+        <Button 
+                Grid.Row="1" 
+                Grid.Column="0" 
+                Grid.ColumnSpan="10" 
+                Command="{Binding OpenTableList}" 
+                Content="Open Table Database" />
 
-            <MediaElement Grid.Row="2" Grid.Column="2" UnloadedBehavior="Close" LoadedBehavior="Play" ScrubbingEnabled="True" IsMuted="True" Source="{Binding SelectedItem.Backglass, ElementName=tableDataGrid}">
-            </MediaElement>
 
-            <MediaElement Grid.Row="2" Grid.Column="2" LoadedBehavior="Stop" IsMuted="True" Source="{Binding SelectedItem.DMD, ElementName=tableDataGrid}">
-            </MediaElement>
+        <!-- Grid to show main table data-->
+        <DataGrid 
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Grid.RowSpan="10"
+                    CanUserSortColumns="False"
+                    x:Name="tableDataGrid"
+                    ItemsSource="{Binding TableList, Mode=TwoWay}"
+                    AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Table Name" Width="*" Binding="{Binding Name}" />
 
-        </Grid>
-        
+            </DataGrid.Columns>
+        </DataGrid>
+
+
+
+        <!-- Playfield Media -->
+        <MediaElement 
+             x:Name="PlayfieldMedia"
+                Grid.Row="2" 
+                Grid.Column="1" 
+                Grid.RowSpan="4" 
+                VerticalAlignment="Top" 
+                HorizontalAlignment="Right" 
+                LoadedBehavior="Manual" 
+                IsMuted="True" 
+                Source="{Binding SelectedItem.Playfield, ElementName=tableDataGrid}"
+            MediaEnded="PlayfieldMediaRepeat"
+            Loaded="PlayfieldMediaRepeat">
+            <MediaElement.LayoutTransform>
+                <RotateTransform Angle="-90" />
+            </MediaElement.LayoutTransform>
+        </MediaElement>
+
+        <!-- Backglass Media -->
+        <MediaElement
+            x:Name="BackglassMedia"
+                Grid.Row="2"
+                Grid.Column="2"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Left"
+                LoadedBehavior="Manual"
+                IsMuted="True"
+                Source="{Binding SelectedItem.Backglass, ElementName=tableDataGrid}" 
+            MediaEnded="BackglassMediaRepeat"
+            Loaded="BackglassMediaRepeat"/>
+
+        <!-- DMD Media -->
+        <MediaElement
+             x:Name="DMDMedia"
+                Grid.Row="3"
+                Grid.Column="2"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Left"
+                LoadedBehavior="Manual" 
+                IsMuted="True"
+                Source="{Binding SelectedItem.DMD, ElementName=tableDataGrid}" 
+            MediaEnded="DMDMediaRepeat"
+            Loaded="DMDMediaRepeat"/>
+
+        <!-- Wheel Media -->
+        <MediaElement
+             x:Name="WheelMedia"
+                Grid.Row="4"
+                Grid.Column="2"
+                VerticalAlignment="Top"
+                LoadedBehavior="Manual"
+                IsMuted="True"
+                Source="{Binding SelectedItem.Wheel, ElementName=tableDataGrid}" 
+            MediaEnded="WheelMediaRepeat"
+            Loaded="WheelMediaRepeat"/>
+
     </Grid>
+
 </Window>
