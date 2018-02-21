@@ -19,7 +19,7 @@ namespace PinballFrontEnd.ViewModel
         }
 
         private List<String> files = new List<string>();
-        
+
         // Commands
         public ICommand NextVideoFile { get { return new RelayCommand(NVF); } }
 
@@ -27,7 +27,7 @@ namespace PinballFrontEnd.ViewModel
         //Default Constructor
         public PinballFrontEndViewModel()
         {
-            
+
 
             files.Add("D:\\AmericanDad.mp4");
             files.Add("D:\\Archer.mp4");
@@ -40,8 +40,8 @@ namespace PinballFrontEnd.ViewModel
 
         public void NVF(object obj)
         {
-            VideoFile=files.ElementAt(
-                files.FindIndex(x => x == VideoFile) >=0 && files.FindIndex(x => x == VideoFile) < files.Count()-1 ? files.FindIndex(x => x == VideoFile)+1 : 0);
+            VideoFile = files.ElementAt(
+                files.FindIndex(x => x == VideoFile) >= 0 && files.FindIndex(x => x == VideoFile) < files.Count() - 1 ? files.FindIndex(x => x == VideoFile) + 1 : 0);
         }
     }
 }

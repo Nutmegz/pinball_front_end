@@ -18,6 +18,7 @@ namespace PinballFrontEnd.Model
         public bool HideDMD { get; set; } = true;
         public bool HideBackglass { get; set; } = true;
         public bool Enabled { get; set; } = true;
+        public String System { get; set; } = "";
 
         //Media File Names
         public Uri Playfield { get; set; } = null;

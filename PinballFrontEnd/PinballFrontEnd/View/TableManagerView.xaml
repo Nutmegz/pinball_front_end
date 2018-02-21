@@ -5,132 +5,396 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PinballFrontEnd.View"
         mc:Ignorable="d"
-        Title="Pinball Front End - Table Monitor" Height="1080" Width="1920">
+        Title="Pinball Front End - Table Monitor" Height="1080" Width="1920"
+        
+        
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="18"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        >
+
+
 
     <Window.Resources>
 
 
         <Thickness x:Key="CommonMargin" Left="6" Right="6" Top="6" Bottom="6" />
 
-        <Style TargetType="Button">
+
+
+        <Style TargetType="Button" >
             <Setter Property="FontSize" Value="20" />
             <Setter Property="Margin" Value="{StaticResource CommonMargin}" />
         </Style>
-        <Style TargetType="DataGrid">
+        <!--<Style TargetType="DataGrid">
             <Setter Property="FontSize" Value="20" />
             <Setter Property="Margin" Value="{StaticResource CommonMargin}" />
-        </Style>
+        </Style>-->
 
         <Style TargetType="MediaElement">
             <Setter Property="Margin" Value="{StaticResource CommonMargin}" />
         </Style>
 
+        <Style TargetType="TextBlock">
+            <Setter Property="Margin" Value="{StaticResource CommonMargin}" />
+        </Style>
+
 
     </Window.Resources>
-
     <Grid>
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" MinHeight="50" />
-            <RowDefinition Height="Auto" MinHeight="50"/>
-            <RowDefinition Height="Auto" MinHeight="50" />
-            <RowDefinition Height="*" MinHeight="50"/>
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+
         <Grid.ColumnDefinitions>
+            <ColumnDefinition MaxWidth="600" />
+            <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="3*" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Button 
+        <StackPanel
+            Grid.Row="0"
+            Grid.Column="0">
+
+            <Button 
                 Grid.Row="0" 
                 Grid.Column="0" 
                 Grid.ColumnSpan="10"  
                 Command="{Binding SaveTableList}" 
-                Content="Save Table Database" />
-        <Button 
+                Content="Save Table Database" 
+                Style="{DynamicResource MaterialDesignRaisedDarkButton}"
+                Margin="{StaticResource CommonMargin}"/>
+            <Button 
                 Grid.Row="1" 
                 Grid.Column="0" 
                 Grid.ColumnSpan="10" 
                 Command="{Binding OpenTableList}" 
-                Content="Open Table Database" />
+                Content="Open Table Database"
+                Style="{DynamicResource MaterialDesignRaisedDarkButton}"
+                Margin="{StaticResource CommonMargin}"/>
+
+        </StackPanel>
+
+        <StackPanel
+            Grid.Row="1"
+            Grid.Column="0">
 
 
-        <!-- Grid to show main table data-->
-        <DataGrid 
-                    Grid.Row="2"
-                    Grid.Column="0"
-                    Grid.RowSpan="10"
-                    CanUserSortColumns="False"
-                    x:Name="tableDataGrid"
-                    ItemsSource="{Binding TableList, Mode=TwoWay}"
-                    AutoGenerateColumns="False">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Table Name" Width="*" Binding="{Binding Name}" />
-
-            </DataGrid.Columns>
-        </DataGrid>
+            <TextBlock
+                Text="System Select"
+                HorizontalAlignment="Center"/>
 
 
+            <ComboBox 
+                ItemsSource="{Binding SystemList}"
+                DisplayMemberPath="Name" />
 
-        <!-- Playfield Media -->
-        <MediaElement 
-             x:Name="PlayfieldMedia"
+            <TextBlock 
+                Text="Table Select" 
+                HorizontalAlignment="Center"/>
+
+            <DataGrid
+                x:Name="TableSelect"
+                ItemsSource="{Binding TableList}"
+                DisplayMemberPath="Name"
+                SelectionMode="Single"
+                AutoGenerateColumns="False"
+                >
+
+                
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn 
+                        Header="Enabled"
+                        Binding="{Binding Enabled}"/>
+                    <DataGridTextColumn
+                        Header="Table"
+                        Binding="{Binding Name}" 
+                        Width="*"/>
+                </DataGrid.Columns>
+
+            </DataGrid>
+
+
+        </StackPanel>
+
+        <!-- Table Information -->
+        <Grid
+            Grid.Column="1"
+            Grid.Row="0"
+            Grid.RowSpan="2">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="3*" />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Table Name -->
+            <TextBlock 
+                Grid.Row="0" 
+                Grid.Column="0"
+                HorizontalAlignment="Right" 
+                Text="Name:" />
+            <TextBox 
+                Grid.Row="0" 
+                Grid.Column="1" 
+                HorizontalAlignment="Stretch"
+                Text="{Binding SelectedItem.Name, ElementName=TableSelect}" />
+            
+            <!-- Table Description -->
+            <TextBlock 
+                Grid.Row="1" 
+                Grid.Column="0"
+                HorizontalAlignment="Right" 
+                Text="Description:" />
+            <TextBox 
+                Grid.Row="1" 
+                Grid.Column="1" 
+                HorizontalAlignment="Stretch"
+                Text="{Binding SelectedItem.Description, ElementName=TableSelect}" />
+
+            <!-- Manufacturer -->
+            <TextBlock 
+                Grid.Row="2" 
+                Grid.Column="0"
+                HorizontalAlignment="Right" 
+                Text="Manufacturer:" />
+            <TextBox 
                 Grid.Row="2" 
                 Grid.Column="1" 
-                Grid.RowSpan="4" 
-                VerticalAlignment="Top" 
+                HorizontalAlignment="Stretch"
+                Text="{Binding SelectedItem.Manufacturer, ElementName=TableSelect}" />
+            
+            <!-- ROM -->
+            <TextBlock 
+                Grid.Row="3" 
+                Grid.Column="0"
                 HorizontalAlignment="Right" 
-                LoadedBehavior="Manual" 
-                IsMuted="True" 
-                Source="{Binding SelectedItem.Playfield, ElementName=tableDataGrid}"
-            MediaEnded="PlayfieldMediaRepeat"
-            Loaded="PlayfieldMediaRepeat">
-            <MediaElement.LayoutTransform>
-                <RotateTransform Angle="-90" />
-            </MediaElement.LayoutTransform>
-        </MediaElement>
+                Text="ROM:" />
+            <TextBox Grid.Row="3" 
+                     Grid.Column="1" 
+                     HorizontalAlignment="Stretch"
+                     Text="{Binding SelectedItem.Rom, ElementName=TableSelect}" />
+            
+            <!--Year -->
+            <TextBlock 
+                Grid.Row="4" 
+                Grid.Column="0"
+                HorizontalAlignment="Right" 
+                Text="Year:" />
+            <TextBox Grid.Row="4" 
+                     Grid.Column="1" 
+                     HorizontalAlignment="Stretch"
+                     Text="{Binding SelectedItem.Year, ElementName=TableSelect}" />
+            
+            <!-- Enabled -->
+            <TextBlock 
+                Grid.Row="5" 
+                Grid.Column="0"
+                HorizontalAlignment="Right" 
+                Text="Enabled:" />
+            <CheckBox Grid.Row="5" 
+                      Grid.Column="1" 
+                      HorizontalAlignment="Stretch"
+                      IsChecked="{Binding SelectedItem.Enabled, ElementName=TableSelect}" />
+            
+            <!-- Playfield -->
+            <TextBlock 
+                Grid.Row="6" 
+                Grid.Column="0"
+                HorizontalAlignment="Right" 
+                Text="Playfield:" />
+            <TextBox Grid.Row="6" 
+                     Grid.Column="1" 
+                     HorizontalAlignment="Stretch"
+                     Text="{Binding SelectedItem.Playfield, ElementName=TableSelect}" />
 
-        <!-- Backglass Media -->
-        <MediaElement
-            x:Name="BackglassMedia"
-                Grid.Row="2"
-                Grid.Column="2"
-                VerticalAlignment="Top"
-                HorizontalAlignment="Left"
-                LoadedBehavior="Manual"
-                IsMuted="True"
-                Source="{Binding SelectedItem.Backglass, ElementName=tableDataGrid}" 
-            MediaEnded="BackglassMediaRepeat"
-            Loaded="BackglassMediaRepeat"/>
+            <!-- Backglass -->
+            <TextBlock 
+                Grid.Row="7" 
+                Grid.Column="0"
+                HorizontalAlignment="Right" 
+                Text="Backglass:" />
+            <TextBox Grid.Row="7" 
+                     Grid.Column="1" 
+                     HorizontalAlignment="Stretch"
+                     Text="{Binding SelectedItem.Backglass, ElementName=TableSelect}" />
 
-        <!-- DMD Media -->
-        <MediaElement
-             x:Name="DMDMedia"
-                Grid.Row="3"
-                Grid.Column="2"
-                VerticalAlignment="Top"
-                HorizontalAlignment="Left"
-                LoadedBehavior="Manual" 
-                IsMuted="True"
-                Source="{Binding SelectedItem.DMD, ElementName=tableDataGrid}" 
-            MediaEnded="DMDMediaRepeat"
-            Loaded="DMDMediaRepeat"/>
+            <!-- DMD -->
+            <TextBlock 
+                Grid.Row="8" 
+                Grid.Column="0"
+                HorizontalAlignment="Right" 
+                Text="DMD:" />
+            <TextBox Grid.Row="8" 
+                     Grid.Column="1" 
+                     HorizontalAlignment="Stretch"
+                     Text="{Binding SelectedItem.DMD, ElementName=TableSelect}" />
 
-        <!-- Wheel Media -->
-        <MediaElement
-             x:Name="WheelMedia"
-                Grid.Row="4"
-                Grid.Column="2"
-                VerticalAlignment="Top"
-                LoadedBehavior="Manual"
-                IsMuted="True"
-                Source="{Binding SelectedItem.Wheel, ElementName=tableDataGrid}" 
-            MediaEnded="WheelMediaRepeat"
-            Loaded="WheelMediaRepeat"/>
+            <!-- Wheel -->
+            <TextBlock 
+                Grid.Row="9" 
+                Grid.Column="0"
+                HorizontalAlignment="Right" 
+                Text="Wheel:" />
+            <TextBox Grid.Row="9" 
+                     Grid.Column="1" 
+                     HorizontalAlignment="Stretch"
+                     Text="{Binding SelectedItem.Wheel, ElementName=TableSelect}" />
+
+
+        </Grid>
+
+        
+        
+        <!-- Media -->
+        <Grid
+            Grid.Row="0"
+            Grid.Column="2"
+            Grid.RowSpan="2">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <DockPanel
+                Grid.Row="0"
+                Grid.Column="0">
+
+
+                <Button
+                    Content="Playfield"
+                    DockPanel.Dock="Top"
+                    HorizontalAlignment="Stretch"
+                    Style="{DynamicResource MaterialDesignRaisedDarkButton}"
+                    Margin="{StaticResource CommonMargin}"/>
+
+                <!-- Playfield Media -->
+                <MediaElement 
+                    x:Name="PlayfieldMedia"
+                    VerticalAlignment="Top" 
+                    HorizontalAlignment="Right" 
+                    LoadedBehavior="Manual" 
+                    IsMuted="True" 
+                    Source="{Binding SelectedItem.Playfield, ElementName=TableSelect}"
+                    MediaEnded="PlayfieldMediaRepeat"
+                    Loaded="PlayfieldMediaRepeat"
+                    DockPanel.Dock="Top">
+                    <MediaElement.LayoutTransform>
+                        <RotateTransform Angle="-90" />
+                    </MediaElement.LayoutTransform>
+                </MediaElement>
+
+            </DockPanel>
+
+
+
+            <DockPanel
+                Grid.Row="0"
+                Grid.Column="1">
+
+
+
+                <Button
+                    Content="Backglass"
+                    DockPanel.Dock="Top"
+                    HorizontalAlignment="Stretch" 
+                    Style="{DynamicResource MaterialDesignRaisedDarkButton}"
+                    Margin="{StaticResource CommonMargin}"/>
+
+
+
+
+                <!-- Backglass Media -->
+                <MediaElement
+                    x:Name="BackglassMedia"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Left"
+                    LoadedBehavior="Manual"
+                    IsMuted="True"
+                    Source="{Binding SelectedItem.Backglass, ElementName=TableSelect}" 
+                    MediaEnded="BackglassMediaRepeat"
+                    Loaded="BackglassMediaRepeat"
+                    DockPanel.Dock="Top"/>
+
+
+                <Button
+                    Content="DMD"
+                    DockPanel.Dock="Top"
+                    HorizontalAlignment="Stretch" 
+                    Style="{DynamicResource MaterialDesignRaisedDarkButton}"
+                    Margin="{StaticResource CommonMargin}"/>
+
+                <!-- DMD Media -->
+                <MediaElement
+                    x:Name="DMDMedia"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Left"
+                    LoadedBehavior="Manual" 
+                    IsMuted="True"
+                    Source="{Binding SelectedItem.DMD, ElementName=TableSelect}" 
+                    MediaEnded="DMDMediaRepeat"
+                    Loaded="DMDMediaRepeat"
+                    DockPanel.Dock="Top"/>
+
+                <Button
+                    Content="Wheel"
+                    DockPanel.Dock="Top"
+                    HorizontalAlignment="Stretch" 
+                    Style="{DynamicResource MaterialDesignRaisedDarkButton}"
+                    Margin="{StaticResource CommonMargin}"/>
+
+                <!-- Wheel Media -->
+                <MediaElement
+                    x:Name="WheelMedia"
+                    VerticalAlignment="Top"
+                    LoadedBehavior="Manual"
+                    IsMuted="True"
+                    Source="{Binding SelectedItem.Wheel, ElementName=TableSelect}" 
+                    MediaEnded="WheelMediaRepeat"
+                    Loaded="WheelMediaRepeat"
+                    DockPanel.Dock="Top">
+
+
+                    <MediaElement.OpacityMask>
+                        <ImageBrush ImageSource="{Binding SelectedItem.Wheel, ElementName=TableSelect}"/>
+                    </MediaElement.OpacityMask>
+                    
+                </MediaElement>
+
+            </DockPanel>
+
+
+
+        </Grid>
 
     </Grid>
+
+
 
 </Window>

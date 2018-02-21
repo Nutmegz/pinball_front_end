@@ -9,11 +9,16 @@ using System.IO;
 using Microsoft.Win32;
 using System.Windows.Input;
 using Newtonsoft.Json;
+using NLog;
 
 namespace PinballFrontEnd.ViewModel
 {
     public class TableManagerViewModel : ViewModelBase
     {
+
+        //Setup Class Logger
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         public ObservableCollection<PinballTable> _tableList;
         public ObservableCollection<PinballTable> TableList
         {
@@ -28,9 +33,26 @@ namespace PinballFrontEnd.ViewModel
             }
         }
 
+
+        public ObservableCollection<PinballSystem> _systemList;
+        public ObservableCollection<PinballSystem> SystemList
+        {
+            get
+            {
+                return _systemList;
+            }
+            set
+            {
+                _systemList = value;
+                NotifyPropertyChanged("SystemList");
+            }
+        }
+
+
         public TableManagerViewModel()
         {
             TableList = new ObservableCollection<PinballTable>();
+            SystemList = new ObservableCollection<PinballSystem>();
         }
 
         // Commands
@@ -40,12 +62,37 @@ namespace PinballFrontEnd.ViewModel
         //Save Tables
         private void SaveTables(object obj)
         {
-            System.IO.File.WriteAllText(GetSaveFile(), JsonConvert.SerializeObject(TableList,Formatting.Indented));
+            var filepath = GetSaveFile();
+
+            if (filepath != null)
+            {
+                var saveData = new SaveFile
+                {
+                    PinballSystems = SystemList,
+                    PinballTables = TableList
+                };
+
+                logger.Info("Saving Database: %s", filepath);
+
+                System.IO.File.WriteAllText(filepath, JsonConvert.SerializeObject(saveData, Formatting.Indented));
+            }
+
+           
         }
 
         private void OpenTables(object obj)
         {
-            TableList = JsonConvert.DeserializeObject<ObservableCollection<PinballTable>>(System.IO.File.ReadAllText(GetOpenFile()));
+            //TableList = JsonConvert.DeserializeObject<ObservableCollection<PinballTable>>(System.IO.File.ReadAllText(GetOpenFile()));
+            var filepath = GetOpenFile();
+
+            if (filepath != null && System.IO.File.Exists(filepath))
+            {
+                SaveFile saveData = JsonConvert.DeserializeObject<SaveFile>(System.IO.File.ReadAllText(filepath));
+                TableList = saveData.PinballTables;
+                SystemList = saveData.PinballSystems;
+            }
+
+            
         }
 
 
