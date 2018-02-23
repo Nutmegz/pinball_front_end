@@ -92,20 +92,33 @@
                 HorizontalAlignment="Center"/>
 
 
-            <ComboBox 
+            <DataGrid 
+                x:Name="SystemSelect"
                 ItemsSource="{Binding SystemList}"
-                DisplayMemberPath="Name" />
+                DisplayMemberPath="Name" 
+                AutoGenerateColumns="False"
+                SelectedValue="{Binding SelectedSystem, Mode=TwoWay}">
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn 
+                        Header="System"
+                        Binding="{Binding Name}"
+                        Width="*"/>
+                </DataGrid.Columns>
+
+            </DataGrid>
+
 
             <TextBlock 
                 Text="Table Select" 
                 HorizontalAlignment="Center"/>
-
             <DataGrid
                 x:Name="TableSelect"
-                ItemsSource="{Binding TableList}"
+                ItemsSource="{Binding SelectedItem.Tables, ElementName=SystemSelect}"
                 DisplayMemberPath="Name"
                 SelectionMode="Single"
                 AutoGenerateColumns="False"
+                SelectedValue="{Binding SelectedTable, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                 >
 
                 
@@ -124,147 +137,265 @@
 
         </StackPanel>
 
-        <!-- Table Information -->
-        <Grid
+        <StackPanel
             Grid.Column="1"
             Grid.Row="0"
             Grid.RowSpan="2">
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="3*" />
-            </Grid.ColumnDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
 
-            <!-- Table Name -->
-            <TextBlock 
-                Grid.Row="0" 
+                <TextBlock
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Text="System Settings"
+                    HorizontalAlignment="Center"
+                    FontWeight="ExtraBold"
+                    />
+
+                <!-- System Name -->
+                <TextBlock
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Text="Name:"
+                    HorizontalAlignment="Right" />
+                <TextBox
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    HorizontalAlignment="Stretch"
+                    Text="{Binding SelectedItem.Name, ElementName=SystemSelect, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- Working Path -->
+                <TextBlock
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Text="Working Path:"
+                    HorizontalAlignment="Right" />
+                <TextBox
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    HorizontalAlignment="Stretch"
+                    Text="{Binding SelectedItem.WorkingPath, ElementName=SystemSelect, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- Executable -->
+                <TextBlock
+                    Grid.Row="3"
+                    Grid.Column="0"
+                    Text="Executable:"
+                    HorizontalAlignment="Right" />
+                <TextBox
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    HorizontalAlignment="Stretch"
+                    Text="{Binding SelectedItem.Executable, ElementName=SystemSelect, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- Parameters -->
+                <TextBlock
+                    Grid.Row="4"
+                    Grid.Column="0"
+                    Text="Parameters:"
+                    HorizontalAlignment="Right" />
+                <TextBox
+                    Grid.Row="4"
+                    Grid.Column="1"
+                    HorizontalAlignment="Stretch"
+                    Text="{Binding SelectedItem.Parameters, ElementName=SystemSelect, UpdateSourceTrigger=PropertyChanged}" />
+
+
+                <!-- Wait Time -->
+                <TextBlock
+                    Grid.Row="5"
+                    Grid.Column="0"
+                    Text="Wait Time:"
+                    HorizontalAlignment="Right" />
+                <TextBox
+                    Grid.Row="5"
+                    Grid.Column="1"
+                    HorizontalAlignment="Stretch"
+                    Text="{Binding SelectedItem.WaitTime, ElementName=SystemSelect, UpdateSourceTrigger=PropertyChanged}" />
+
+
+            </Grid>
+
+            <!-- Table Information -->
+            <Grid>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="3*" />
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Text="Table Settings"
+                    HorizontalAlignment="Center"
+                    FontWeight="ExtraBold"
+                    />
+
+                <!-- Table Name -->
+                <TextBlock 
+                Grid.Row="1" 
                 Grid.Column="0"
                 HorizontalAlignment="Right" 
                 Text="Name:" />
-            <TextBox 
-                Grid.Row="0" 
+                <TextBox 
+                Grid.Row="1" 
                 Grid.Column="1" 
                 HorizontalAlignment="Stretch"
-                Text="{Binding SelectedItem.Name, ElementName=TableSelect}" />
-            
-            <!-- Table Description -->
-            <TextBlock 
-                Grid.Row="1" 
+                Text="{Binding SelectedItem.Name, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- Table Description -->
+                <TextBlock 
+                Grid.Row="2" 
                 Grid.Column="0"
                 HorizontalAlignment="Right" 
                 Text="Description:" />
-            <TextBox 
-                Grid.Row="1" 
+                <TextBox 
+                Grid.Row="2" 
                 Grid.Column="1" 
                 HorizontalAlignment="Stretch"
-                Text="{Binding SelectedItem.Description, ElementName=TableSelect}" />
+                Text="{Binding SelectedItem.Description, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged}" />
 
-            <!-- Manufacturer -->
-            <TextBlock 
-                Grid.Row="2" 
-                Grid.Column="0"
-                HorizontalAlignment="Right" 
-                Text="Manufacturer:" />
-            <TextBox 
-                Grid.Row="2" 
-                Grid.Column="1" 
-                HorizontalAlignment="Stretch"
-                Text="{Binding SelectedItem.Manufacturer, ElementName=TableSelect}" />
-            
-            <!-- ROM -->
-            <TextBlock 
+                <!-- Manufacturer -->
+                <TextBlock 
                 Grid.Row="3" 
                 Grid.Column="0"
                 HorizontalAlignment="Right" 
-                Text="ROM:" />
-            <TextBox Grid.Row="3" 
-                     Grid.Column="1" 
-                     HorizontalAlignment="Stretch"
-                     Text="{Binding SelectedItem.Rom, ElementName=TableSelect}" />
-            
-            <!--Year -->
-            <TextBlock 
+                Text="Manufacturer:" />
+                <TextBox 
+                Grid.Row="3" 
+                Grid.Column="1" 
+                HorizontalAlignment="Stretch"
+                Text="{Binding SelectedItem.Manufacturer, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- ROM -->
+                <TextBlock 
                 Grid.Row="4" 
                 Grid.Column="0"
                 HorizontalAlignment="Right" 
-                Text="Year:" />
-            <TextBox Grid.Row="4" 
+                Text="ROM:" />
+                <TextBox Grid.Row="4" 
                      Grid.Column="1" 
                      HorizontalAlignment="Stretch"
-                     Text="{Binding SelectedItem.Year, ElementName=TableSelect}" />
-            
-            <!-- Enabled -->
-            <TextBlock 
+                     Text="{Binding SelectedItem.Rom, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!--Year -->
+                <TextBlock 
                 Grid.Row="5" 
                 Grid.Column="0"
                 HorizontalAlignment="Right" 
-                Text="Enabled:" />
-            <CheckBox Grid.Row="5" 
-                      Grid.Column="1" 
-                      HorizontalAlignment="Stretch"
-                      IsChecked="{Binding SelectedItem.Enabled, ElementName=TableSelect}" />
-            
-            <!-- Playfield -->
-            <TextBlock 
+                Text="Year:" />
+                <TextBox Grid.Row="5" 
+                     Grid.Column="1" 
+                     HorizontalAlignment="Stretch"
+                     Text="{Binding SelectedItem.Year, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- Enabled -->
+                <TextBlock 
                 Grid.Row="6" 
                 Grid.Column="0"
                 HorizontalAlignment="Right" 
-                Text="Playfield:" />
-            <TextBox Grid.Row="6" 
-                     Grid.Column="1" 
-                     HorizontalAlignment="Stretch"
-                     Text="{Binding SelectedItem.Playfield, ElementName=TableSelect}" />
+                Text="Enabled:" />
+                <CheckBox Grid.Row="6" 
+                      Grid.Column="1" 
+                      HorizontalAlignment="Stretch"
+                      IsChecked="{Binding SelectedItem.Enabled, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged}" />
 
-            <!-- Backglass -->
-            <TextBlock 
+                <!-- Playfield -->
+                <TextBlock 
                 Grid.Row="7" 
                 Grid.Column="0"
                 HorizontalAlignment="Right" 
-                Text="Backglass:" />
-            <TextBox Grid.Row="7" 
+                Text="Playfield:" />
+                <TextBox Grid.Row="7" 
                      Grid.Column="1" 
                      HorizontalAlignment="Stretch"
-                     Text="{Binding SelectedItem.Backglass, ElementName=TableSelect}" />
+                     Text="{Binding SelectedItem.Playfield, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
-            <!-- DMD -->
-            <TextBlock 
+                <!-- Backglass -->
+                <TextBlock 
                 Grid.Row="8" 
                 Grid.Column="0"
                 HorizontalAlignment="Right" 
-                Text="DMD:" />
-            <TextBox Grid.Row="8" 
+                Text="Backglass:" />
+                <TextBox Grid.Row="8" 
                      Grid.Column="1" 
                      HorizontalAlignment="Stretch"
-                     Text="{Binding SelectedItem.DMD, ElementName=TableSelect}" />
+                     Text="{Binding SelectedItem.Backglass, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
-            <!-- Wheel -->
-            <TextBlock 
+                <!-- DMD -->
+                <TextBlock 
                 Grid.Row="9" 
                 Grid.Column="0"
                 HorizontalAlignment="Right" 
-                Text="Wheel:" />
-            <TextBox Grid.Row="9" 
+                Text="DMD:" />
+                <TextBox Grid.Row="9" 
                      Grid.Column="1" 
                      HorizontalAlignment="Stretch"
-                     Text="{Binding SelectedItem.Wheel, ElementName=TableSelect}" />
+                     Text="{Binding SelectedItem.DMD, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- Wheel -->
+                <TextBlock 
+                Grid.Row="10" 
+                Grid.Column="0"
+                HorizontalAlignment="Right" 
+                Text="Wheel:" />
+                <TextBox Grid.Row="10" 
+                     Grid.Column="1" 
+                     HorizontalAlignment="Stretch"
+                     Text="{Binding SelectedItem.Wheel, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged}" />
 
 
-        </Grid>
+            </Grid>
+
+
+            <Button
+                Content="Launch"
+                Style="{DynamicResource MaterialDesignRaisedDarkButton}"
+                Margin="{StaticResource CommonMargin}" 
+                Command="{Binding Launch}" />
+
+
+
+        </StackPanel>
+
+
 
         
         
@@ -292,7 +423,8 @@
                     DockPanel.Dock="Top"
                     HorizontalAlignment="Stretch"
                     Style="{DynamicResource MaterialDesignRaisedDarkButton}"
-                    Margin="{StaticResource CommonMargin}"/>
+                    Margin="{StaticResource CommonMargin}" 
+                    Command="{Binding SelectPlayfield}"/>
 
                 <!-- Playfield Media -->
                 <MediaElement 
@@ -325,11 +457,8 @@
                     DockPanel.Dock="Top"
                     HorizontalAlignment="Stretch" 
                     Style="{DynamicResource MaterialDesignRaisedDarkButton}"
-                    Margin="{StaticResource CommonMargin}"/>
-
-
-
-
+                    Margin="{StaticResource CommonMargin}"
+                    Command="{Binding SelectBackglass}"/>
                 <!-- Backglass Media -->
                 <MediaElement
                     x:Name="BackglassMedia"
@@ -348,7 +477,8 @@
                     DockPanel.Dock="Top"
                     HorizontalAlignment="Stretch" 
                     Style="{DynamicResource MaterialDesignRaisedDarkButton}"
-                    Margin="{StaticResource CommonMargin}"/>
+                    Margin="{StaticResource CommonMargin}"
+                    Command="{Binding SelectDMD}"/>
 
                 <!-- DMD Media -->
                 <MediaElement
@@ -367,7 +497,8 @@
                     DockPanel.Dock="Top"
                     HorizontalAlignment="Stretch" 
                     Style="{DynamicResource MaterialDesignRaisedDarkButton}"
-                    Margin="{StaticResource CommonMargin}"/>
+                    Margin="{StaticResource CommonMargin}"
+                    Command="{Binding SelectWheel}"/>
 
                 <!-- Wheel Media -->
                 <MediaElement
