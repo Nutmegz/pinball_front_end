@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PinballFrontEnd.View"
         mc:Ignorable="d"
-        Title="Pinball Front End - Table Monitor" Height="1080" Width="1920"
+        Title="Pinball Front End - Settings" Height="1080" Width="1920"
         
         
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
@@ -31,6 +31,10 @@
             <Setter Property="FontSize" Value="20" />
             <Setter Property="Margin" Value="{StaticResource CommonMargin}" />
         </Style>
+
+        <!--<Style TargetType="TextBox">
+            <Setter Property="Margin" Value="{StaticResource CommonMargin}" />
+        </Style>-->
         <!--<Style TargetType="DataGrid">
             <Setter Property="FontSize" Value="20" />
             <Setter Property="Margin" Value="{StaticResource CommonMargin}" />
@@ -63,7 +67,7 @@
             Grid.Row="0"
             Grid.Column="0">
 
-            <Button 
+            <!--<Button 
                 Grid.Row="0" 
                 Grid.Column="0" 
                 Grid.ColumnSpan="10"  
@@ -78,18 +82,23 @@
                 Command="{Binding OpenTableList}" 
                 Content="Open Table Database"
                 Style="{DynamicResource MaterialDesignRaisedDarkButton}"
-                Margin="{StaticResource CommonMargin}"/>
+                Margin="{StaticResource CommonMargin}"/>-->
 
         </StackPanel>
 
-        <StackPanel
+        <DockPanel
             Grid.Row="1"
-            Grid.Column="0">
+            Grid.Column="0"
+            ScrollViewer.CanContentScroll="True"
+            ScrollViewer.VerticalScrollBarVisibility="Auto">
 
 
             <TextBlock
                 Text="System Select"
-                HorizontalAlignment="Center"/>
+                HorizontalAlignment="Center"
+                DockPanel.Dock="Top"
+                FontWeight="Bold"
+                FontSize="20"/>
 
 
             <DataGrid 
@@ -97,7 +106,8 @@
                 ItemsSource="{Binding SystemList}"
                 DisplayMemberPath="Name" 
                 AutoGenerateColumns="False"
-                SelectedValue="{Binding SelectedSystem, Mode=TwoWay}">
+                SelectedValue="{Binding SelectedSystem, Mode=TwoWay}"
+                DockPanel.Dock="Top">
 
                 <DataGrid.Columns>
                     <DataGridTextColumn 
@@ -111,14 +121,21 @@
 
             <TextBlock 
                 Text="Table Select" 
-                HorizontalAlignment="Center"/>
+                HorizontalAlignment="Center"
+                DockPanel.Dock="Top"
+                FontWeight="Bold"
+                FontSize="20"/>
             <DataGrid
                 x:Name="TableSelect"
-                ItemsSource="{Binding SelectedItem.Tables, ElementName=SystemSelect}"
+                ItemsSource="{Binding TableList}"
                 DisplayMemberPath="Name"
                 SelectionMode="Single"
                 AutoGenerateColumns="False"
                 SelectedValue="{Binding SelectedTable, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                ScrollViewer.CanContentScroll="True"
+                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                DockPanel.Dock="Top"
                 >
 
                 
@@ -128,20 +145,251 @@
                         Binding="{Binding Enabled}"/>
                     <DataGridTextColumn
                         Header="Table"
-                        Binding="{Binding Name}" 
+                        Binding="{Binding Description}" 
                         Width="*"/>
                 </DataGrid.Columns>
 
             </DataGrid>
 
 
-        </StackPanel>
+        </DockPanel>
 
         <StackPanel
             Grid.Column="1"
             Grid.Row="0"
             Grid.RowSpan="2">
 
+            <!-- FrontEnd Settings -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <TextBlock
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Grid.ColumnSpan="3"
+                    Text="Front End Settings"
+                    HorizontalAlignment="Center"
+                    FontWeight="ExtraBold"
+                    FontSize="20"
+                    />
+
+                <TextBlock 
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Text="Playfield"
+                    HorizontalAlignment="Center"
+                    FontWeight="Bold"
+                    FontSize="20"/>
+
+                <TextBlock 
+                    Grid.Row="1"
+                    Grid.Column="2"
+                    Text="Backglass"
+                    HorizontalAlignment="Center"
+                    FontWeight="Bold"
+                    FontSize="20"/>
+
+                <TextBlock 
+                    Grid.Row="1"
+                    Grid.Column="3"
+                    Text="DMD"
+                    HorizontalAlignment="Center"
+                    FontWeight="Bold"
+                    FontSize="20"/>
+
+                
+                <TextBlock
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Text="X Location:"
+                    HorizontalAlignment="Right" />
+
+                <TextBlock
+                    Grid.Row="3"
+                    Grid.Column="0"
+                    Text="Y Location:"
+                    HorizontalAlignment="Right" />
+
+                <TextBlock
+                    Grid.Row="4"
+                    Grid.Column="0"
+                    Text="Width:"
+                    HorizontalAlignment="Right" />
+
+                <TextBlock
+                    Grid.Row="5"
+                    Grid.Column="0"
+                    Text="Height:"
+                    HorizontalAlignment="Right" />
+
+                <TextBlock
+                    Grid.Row="6"
+                    Grid.Column="0"
+                    Text="Rotation:"
+                    HorizontalAlignment="Right" />
+
+                <!-- Playfield X Location -->
+                <TextBox
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding MediaLocation.PlayfieldLocationX, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- Playfield Y Location -->
+                <TextBox
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding MediaLocation.PlayfieldLocationY, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- Playfield Width -->
+                <TextBox
+                    Grid.Row="4"
+                    Grid.Column="1"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding MediaLocation.PlayfieldSizeX, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- Playfield Height -->
+                <TextBox
+                    Grid.Row="5"
+                    Grid.Column="1"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding MediaLocation.PlayfieldSizeY, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- Playfield Rotation -->
+                <TextBox
+                    Grid.Row="6"
+                    Grid.Column="1"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding MediaLocation.PlayfieldRotation, UpdateSourceTrigger=PropertyChanged}" />
+
+
+                <!-- Backglass X Location -->
+                <TextBox
+                    Grid.Row="2"
+                    Grid.Column="2"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding MediaLocation.BackglassLocationX, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- Backglass Y Location -->
+                <TextBox
+                    Grid.Row="3"
+                    Grid.Column="2"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding MediaLocation.BackglassLocationY, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- Backglass Width -->
+                <TextBox
+                    Grid.Row="4"
+                    Grid.Column="2"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding MediaLocation.BackglassSizeX, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- Backglass Height -->
+                <TextBox
+                    Grid.Row="5"
+                    Grid.Column="2"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding MediaLocation.BackglassSizeY, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- Backglass Rotation -->
+                <TextBox
+                    Grid.Row="6"
+                    Grid.Column="2"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding MediaLocation.BackglassRotation, UpdateSourceTrigger=PropertyChanged}" />
+
+
+                <!-- DMD X Location -->
+                <TextBox
+                    Grid.Row="2"
+                    Grid.Column="3"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding MediaLocation.DMDLocationX, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- DMD Y Location -->
+                <TextBox
+                    Grid.Row="3"
+                    Grid.Column="3"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding MediaLocation.DMDLocationY, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- DMD Width -->
+                <TextBox
+                    Grid.Row="4"
+                    Grid.Column="3"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding MediaLocation.DMDSizeX, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- DMD Height -->
+                <TextBox
+                    Grid.Row="5"
+                    Grid.Column="3"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding MediaLocation.DMDSizeY, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- DMD Rotation -->
+                <TextBox
+                    Grid.Row="6"
+                    Grid.Column="3"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding MediaLocation.DMDRotation, UpdateSourceTrigger=PropertyChanged}" />
+
+
+            </Grid>
+
+
+            <!-- System Information -->
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -165,11 +413,12 @@
 
                 <TextBlock
                     Grid.Row="0"
-                    Grid.Column="0"
-                    Grid.ColumnSpan="2"
+                    Grid.Column="1"
+                    Grid.ColumnSpan="1"
                     Text="System Settings"
                     HorizontalAlignment="Center"
                     FontWeight="ExtraBold"
+                    FontSize="20"
                     />
 
                 <!-- System Name -->
@@ -261,11 +510,12 @@
 
                 <TextBlock
                     Grid.Row="0"
-                    Grid.Column="0"
+                    Grid.Column="1"
                     Grid.ColumnSpan="2"
                     Text="Table Settings"
                     HorizontalAlignment="Center"
                     FontWeight="ExtraBold"
+                    FontSize="20"
                     />
 
                 <!-- Table Name -->
@@ -346,7 +596,8 @@
                 <TextBox Grid.Row="7" 
                      Grid.Column="1" 
                      HorizontalAlignment="Stretch"
-                     Text="{Binding SelectedItem.Playfield, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                     IsReadOnly="True"
+                     Text="{Binding SelectedItem.Playfield, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" />
 
                 <!-- Backglass -->
                 <TextBlock 
@@ -357,7 +608,8 @@
                 <TextBox Grid.Row="8" 
                      Grid.Column="1" 
                      HorizontalAlignment="Stretch"
-                     Text="{Binding SelectedItem.Backglass, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                     IsReadOnly="True"
+                     Text="{Binding SelectedItem.Backglass, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" />
 
                 <!-- DMD -->
                 <TextBlock 
@@ -368,7 +620,8 @@
                 <TextBox Grid.Row="9" 
                      Grid.Column="1" 
                      HorizontalAlignment="Stretch"
-                     Text="{Binding SelectedItem.DMD, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged}" />
+                     IsReadOnly="True"
+                     Text="{Binding SelectedItem.DMD, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" />
 
                 <!-- Wheel -->
                 <TextBlock 
@@ -379,17 +632,34 @@
                 <TextBox Grid.Row="10" 
                      Grid.Column="1" 
                      HorizontalAlignment="Stretch"
-                     Text="{Binding SelectedItem.Wheel, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged}" />
+                     IsReadOnly="True"
+                     Text="{Binding SelectedItem.Wheel, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" />
+                
+                <!-- System -->
+                <TextBlock 
+                Grid.Row="11" 
+                Grid.Column="0"
+                HorizontalAlignment="Right" 
+                Text="System:" />
+                <ComboBox Grid.Row="11" 
+                     Grid.Column="1" 
+                     HorizontalAlignment="Stretch"
+                     ItemsSource="{Binding SystemList}"
+                     DisplayMemberPath="Name"
+                          
+                     SelectedValue="{Binding SelectedItem.System, ElementName=TableSelect}"
+                     SelectedValuePath="Name"
+                     />
 
 
             </Grid>
 
 
-            <Button
+            <!--<Button
                 Content="Launch"
                 Style="{DynamicResource MaterialDesignRaisedDarkButton}"
                 Margin="{StaticResource CommonMargin}" 
-                Command="{Binding Launch}" />
+                Command="{Binding Launch}" />-->
 
 
 
@@ -423,8 +693,7 @@
                     DockPanel.Dock="Top"
                     HorizontalAlignment="Stretch"
                     Style="{DynamicResource MaterialDesignRaisedDarkButton}"
-                    Margin="{StaticResource CommonMargin}" 
-                    Command="{Binding SelectPlayfield}"/>
+                    Margin="{StaticResource CommonMargin}" />
 
                 <!-- Playfield Media -->
                 <MediaElement 
@@ -457,8 +726,7 @@
                     DockPanel.Dock="Top"
                     HorizontalAlignment="Stretch" 
                     Style="{DynamicResource MaterialDesignRaisedDarkButton}"
-                    Margin="{StaticResource CommonMargin}"
-                    Command="{Binding SelectBackglass}"/>
+                    Margin="{StaticResource CommonMargin}"/>
                 <!-- Backglass Media -->
                 <MediaElement
                     x:Name="BackglassMedia"
@@ -477,8 +745,7 @@
                     DockPanel.Dock="Top"
                     HorizontalAlignment="Stretch" 
                     Style="{DynamicResource MaterialDesignRaisedDarkButton}"
-                    Margin="{StaticResource CommonMargin}"
-                    Command="{Binding SelectDMD}"/>
+                    Margin="{StaticResource CommonMargin}"/>
 
                 <!-- DMD Media -->
                 <MediaElement
@@ -497,8 +764,7 @@
                     DockPanel.Dock="Top"
                     HorizontalAlignment="Stretch" 
                     Style="{DynamicResource MaterialDesignRaisedDarkButton}"
-                    Margin="{StaticResource CommonMargin}"
-                    Command="{Binding SelectWheel}"/>
+                    Margin="{StaticResource CommonMargin}"/>
 
                 <!-- Wheel Media -->
                 <MediaElement

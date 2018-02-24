@@ -14,7 +14,8 @@ using System.Windows.Shapes;
 using System.IO;
 using System.Windows.Forms;
 using NLog;
-//using DesktopWPFAppLowLevelKeyboardHook;
+using PinballFrontEnd.Model;
+using System.Collections.ObjectModel;
 
 namespace PinballFrontEnd.View
 {
@@ -27,18 +28,16 @@ namespace PinballFrontEnd.View
         //Setup Class Logger
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        public TableManagerView()
+        public TableManagerView(ObservableCollection<PinballSystem> systems, ObservableCollection<PinballTable> tables, MediaLocation medialoc)
         {
             InitializeComponent();
 
             var viewModel = new PinballFrontEnd.ViewModel.TableManagerViewModel();
             this.DataContext = viewModel;
+            viewModel.TableList = tables;
+            viewModel.SystemList = systems;
+            viewModel.MediaLocation = medialoc;
 
-
-            //Start keyboard listener
-            //_listener = new LowLevelKeyboardListener();
-            //_listener.OnKeyPressed += _listener_OnKeyPressed;
-            //_listener.HookKeyboard();
         }
 
 
@@ -68,23 +67,6 @@ namespace PinballFrontEnd.View
             WheelMedia.Position = TimeSpan.Zero;
             WheelMedia.Play();
         }
-
-
-
-
-
-
-        ///////////////////////////////////////////////////////////////
-        ///////////////////////////////////////////////////////////////
-
-        //private LowLevelKeyboardListener _listener;
-
-        //void _listener_OnKeyPressed(object sender, KeyPressedArgs e)
-        //{
-        //    Console.WriteLine(e.KeyPressed.ToString());
-        //}
-        //////////////////////////////////////////////////////////////////
-        /////////////////////////////////////////////////////////////////
 
     }
 }

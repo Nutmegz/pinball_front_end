@@ -17,9 +17,10 @@ namespace PinballFrontEnd.Model
         public String Parameters { get; set; } = "";
         public int WaitTime { get; set; } = 0;
 
-        public ObservableCollection<PinballTable> Tables { get; set; } = new ObservableCollection<PinballTable>();
+        //public ObservableCollection<PinballTable> Tables { get; set; } = new ObservableCollection<PinballTable>();
 
         public event PropertyChangedEventHandler PropertyChanged;
+
 
         protected void NotifyPropertyChanged(String propertyname)
         {

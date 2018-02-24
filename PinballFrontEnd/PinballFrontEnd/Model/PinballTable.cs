@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
+using Newtonsoft.Json;
 
 namespace PinballFrontEnd.Model
 {
-    
+
     public class PinballTable : INotifyPropertyChanged
     {
         //Properties
@@ -15,7 +16,7 @@ namespace PinballFrontEnd.Model
         public string Description { get; set; } = "";
         public string Rom { get; set; } = "";
         public string Manufacturer { get; set; } = "";
-        public int Year { get; set; } = 0;
+        public string Year { get; set; } = "";
         public bool HideDMD { get; set; } = true;
         public bool HideBackglass { get; set; } = true;
         public bool Enabled { get; set; } = true;
@@ -23,10 +24,35 @@ namespace PinballFrontEnd.Model
         public String Keywords { get; set; } = "";
 
         //Media File Names
-        public Uri Playfield { get; set; } = null;
-        public Uri Backglass { get; set; } = null;
-        public Uri DMD { get; set; } = null;
-        public Uri Wheel { get; set; } = null;
+        [JsonIgnore]
+        public Uri Playfield
+        {
+            get { return new Uri($"{ProgramPath.Value}Media\\{System}\\Playfield\\{Description}.mp4"); }
+        }
+
+        [JsonIgnore]
+        public Uri Backglass
+        {
+            get { return new Uri($"{ProgramPath.Value}Media\\{System}\\Backglass\\{Description}.mp4"); }
+        }
+
+        [JsonIgnore]
+        public Uri DMD
+        {
+            get { return new Uri($"{ProgramPath.Value}Media\\{System}\\DMD\\{Description}.mp4"); }
+        }
+
+        [JsonIgnore]
+        public Uri Wheel
+        {
+            get { return new Uri($"{ProgramPath.Value}Media\\{System}\\Wheel\\{Description}.png"); }
+        }
+
+
+        //public Uri Playfield { get; set; } = null;
+        //public Uri Backglass { get; set; } = null;
+        //public Uri DMD { get; set; } = null;
+        //public Uri Wheel { get; set; } = null;
 
 
         public event PropertyChangedEventHandler PropertyChanged;

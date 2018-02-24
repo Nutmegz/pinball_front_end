@@ -106,16 +106,27 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Model\Keybindings.cs" />
     <Compile Include="Model\LowLevelKeyboardListener.cs" />
+    <Compile Include="Model\MediaLocation.cs" />
     <Compile Include="Model\PinballSystem.cs" />
     <Compile Include="Model\PinballTable.cs" />
+    <Compile Include="Model\StoreData.cs" />
     <Compile Include="ViewModel\PinballFrontEndViewModel.cs" />
     <Compile Include="ViewModel\RelayCommand.cs" />
+    <Compile Include="View\SystemToStringConverter.cs" />
     <Compile Include="ViewModel\TableManagerViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
+    <Compile Include="View\BackglassVideoView.xaml.cs">
+      <DependentUpon>BackglassVideoView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\DMDVideoView.xaml.cs">
+      <DependentUpon>DMDVideoView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\PinballFrontEndView.xaml.cs">
       <DependentUpon>PinballFrontEndView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Model\ProgramPath.cs" />
     <Compile Include="View\TableManagerView.xaml.cs">
       <DependentUpon>TableManagerView.xaml</DependentUpon>
     </Compile>
@@ -155,6 +166,14 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="View\BackglassVideoView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\DMDVideoView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\PinballFrontEndView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -166,7 +185,9 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <None Include="FodyWeavers.xml" />
+    <None Include="FodyWeavers.xml">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

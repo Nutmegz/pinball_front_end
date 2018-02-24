@@ -5,10 +5,55 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PinballFrontEnd.View"
         mc:Ignorable="d"
-        Title="PinballFrontEndView" Height="1080" Width="1920"
-        WindowStartupLocation="Manual">
+        Title="PinballFrontEndView"
+        WindowStartupLocation="Manual"
+        WindowStyle="None"
+        Height="{Binding MediaLocation.PlayfieldSizeY, Mode=TwoWay}"
+        Width="{Binding MediaLocation.PlayfieldSizeX, Mode=TwoWay}"
+        Left="{Binding MediaLocation.PlayfieldLocationX, Mode=TwoWay}"
+        Top="{Binding MediaLocation.PlayfieldLocationY, Mode=TwoWay}"
+        Visibility="{Binding MediaLocation.PlayfieldVisable, Converter={StaticResource BooleanToVisibilityConverter}, Mode=TwoWay}"
+        Background="Black"
+        ResizeMode="NoResize"
+        x:Name="pfw"
+        >
     <Grid>
-        <MediaElement Source="{Binding VideoFile}" ></MediaElement>
-        <Button Command="{Binding NextVideoFile}" Width="100" Height="100">Test</Button>
+        <MediaElement 
+            x:Name="PlayfieldMedia"
+            Source="{Binding CurrentTable.Playfield}" 
+            MediaEnded="PlayfieldMediaRepeat"
+            Loaded="PlayfieldMediaRepeat"
+            IsMuted="True"
+            LoadedBehavior="Manual">
+
+            <MediaElement.LayoutTransform>
+                <TransformGroup>
+                    <RotateTransform Angle="{Binding MediaLocation.PlayfieldRotation}" />
+                </TransformGroup>
+            </MediaElement.LayoutTransform>
+            
+        </MediaElement>
+
+        <Canvas>
+            <MediaElement
+            x:Name="WheelMedia"
+            Source="{Binding CurrentTable.Wheel}"
+            LoadedBehavior="Play"
+            IsMuted="True">
+
+                <MediaElement.OpacityMask>
+                    <ImageBrush ImageSource="{Binding CurrentTable.Wheel}"/>
+                </MediaElement.OpacityMask>
+
+                <MediaElement.LayoutTransform>
+                    <TransformGroup>
+                        <RotateTransform Angle="{Binding MediaLocation.PlayfieldRotation}" />
+                    </TransformGroup>
+                </MediaElement.LayoutTransform>
+
+            </MediaElement>
+        </Canvas>
+        
     </Grid>
 </Window>
+    

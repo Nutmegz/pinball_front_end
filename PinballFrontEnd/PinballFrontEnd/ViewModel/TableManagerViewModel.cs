@@ -16,63 +16,22 @@ using System.Text.RegularExpressions;
 
 namespace PinballFrontEnd.ViewModel
 {
-    public class TableManagerViewModel : ViewModelBase, IDisposable
+    public class TableManagerViewModel : ViewModelBase
     {
         //Setup Class Logger
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        //Global Keyboard Listener Hook
-        private LowLevelKeyboardListener _listener;
+        public ObservableCollection<PinballSystem> SystemList { get; set; } = new ObservableCollection<PinballSystem>();
+        public ObservableCollection<PinballTable> TableList { get; set; } = new ObservableCollection<PinballTable>();
+        public MediaLocation MediaLocation { get; set; } = new MediaLocation();
 
-        public ObservableCollection<PinballSystem> SystemList { get; set; }
         public PinballSystem SelectedSystem { get; set; }
         public PinballTable SelectedTable { get; set; }
 
 
+        #region Obsolete
+        private int procID;
 
-        public TableManagerViewModel()
-        {
-            //TableList = new ObservableCollection<PinballTable>();
-            SystemList = new ObservableCollection<PinballSystem>();
-
-
-            //Start keyboard listener and subscribe
-            _listener = new LowLevelKeyboardListener();
-            _listener.OnKeyPressed += _listener_OnKeyPressed;
-            _listener.HookKeyboard();
-        }
-
-        //De-Register Keyboard Hook
-        public void Dispose()
-        {
-            _listener.UnHookKeyboard();
-        }
-
-        //Handle Global Key Events
-        void _listener_OnKeyPressed(object sender, KeyPressedArgs e)
-        {
-
-
-            if (e.KeyPressed == Key.Escape)
-            {
-                try
-                {
-                    var proc = Process.GetProcessesByName("Pinball FX3");
-
-                    if (proc.Length > 0)
-                    {
-                        proc[0].Kill();
-                    }
-
-                }
-                catch (Exception)
-                {
-
-                    throw;
-                }
-
-            }
-        }
 
         // Commands
         public ICommand SaveTableList { get { return new RelayCommand(SaveTables); } }
@@ -80,22 +39,31 @@ namespace PinballFrontEnd.ViewModel
 
         public ICommand Launch { get { return new RelayCommand(LaunchP); } }
 
+        private PinballSystem FindSystem(PinballTable table)
+        {
+            return SystemList.Single(x => x.Name == table.System);
+        }
+
         private void LaunchP(object obj)
         {
+            var system = FindSystem(SelectedTable);
 
-            var regex = new Regex(@"\[TABLE_NAME\]");
-            var param = regex.Replace(SelectedSystem.Parameters, SelectedTable.Name);
 
-            regex = new Regex(@"\[SYSTEM_PATH\]");
+            var regex = new Regex(@"\[TABLENAME\]");
+            var param = regex.Replace(system.Parameters, SelectedTable.Name);
+
+            regex = new Regex(@"\[SYSTEMPATH\]");
+            param = regex.Replace(param, system.WorkingPath);
 
             logger.Debug(param);
             var proc = new Process();
-            proc.StartInfo.FileName = SelectedSystem.WorkingPath + "\\" + SelectedSystem.Executable;
+            proc.StartInfo.FileName = system.WorkingPath + "\\" + system.Executable;
             proc.StartInfo.Arguments = param;
             proc.Start();
+            procID = proc.Id;
+            Console.WriteLine(proc.Id);
 
         }
-
 
         #region Select Media
 
@@ -106,7 +74,7 @@ namespace PinballFrontEnd.ViewModel
             var filename = GetOpenFile(".mp4", "Media File (*.mp4)|*.mp4");
             if (filename != null && File.Exists(filename))
             {
-                SelectedTable.Playfield = new Uri(filename);
+                //SelectedTable.Playfield = new Uri(filename);
             }
         }
 
@@ -117,7 +85,7 @@ namespace PinballFrontEnd.ViewModel
             var filename = GetOpenFile(".mp4", "Media File (*.mp4)|*.mp4");
             if (filename != null && File.Exists(filename))
             {
-                SelectedTable.Backglass = new Uri(filename);
+                //SelectedTable.Backglass = new Uri(filename);
             }
         }
 
@@ -128,7 +96,7 @@ namespace PinballFrontEnd.ViewModel
             var filename = GetOpenFile(".mp4", "Media File (*.mp4)|*.mp4");
             if (filename != null && File.Exists(filename))
             {
-                SelectedTable.DMD = new Uri(filename);
+                //SelectedTable.DMD = new Uri(filename);
             }
         }
 
@@ -139,14 +107,13 @@ namespace PinballFrontEnd.ViewModel
             var filename = GetOpenFile(".png", "Media File (*.png)|*.png");
             if (filename != null && File.Exists(filename))
             {
-                SelectedTable.Wheel = new Uri(filename);
+                //SelectedTable.Wheel = new Uri(filename);
             }
 
         }
 
 
         #endregion
-
 
         //Save Tables
         private void SaveTables(object obj)
@@ -156,9 +123,33 @@ namespace PinballFrontEnd.ViewModel
             if (filepath != null)
             {
                 logger.Info("Saving Database: %s", filepath);
+                SortSystemsTables();
 
-                System.IO.File.WriteAllText(filepath, JsonConvert.SerializeObject(SystemList, Formatting.Indented));
+                var storedata = new StoreData();
+                storedata.SystemList = SystemList;
+                storedata.TableList = TableList;
+
+                System.IO.File.WriteAllText(filepath, JsonConvert.SerializeObject(storedata, Formatting.Indented));
             }
+
+
+        }
+
+        private void LoadDatabase()
+        {
+            var databasepath = $"{Model.ProgramPath.Value}database.json";
+            logger.Info($"Loading Database: {databasepath}");
+            //SystemList = JsonConvert.DeserializeObject<ObservableCollection<PinballSystem>>(System.IO.File.ReadAllText(databasepath));
+            StoreData storedata = JsonConvert.DeserializeObject<StoreData>(System.IO.File.ReadAllText(databasepath));
+            SystemList = storedata.SystemList;
+            TableList = storedata.TableList;
+        }
+
+        private void SaveData()
+        {
+            var storedata = new StoreData();
+            storedata.SystemList = SystemList;
+            storedata.TableList = TableList;
 
 
         }
@@ -170,13 +161,35 @@ namespace PinballFrontEnd.ViewModel
 
             if (filepath != null && System.IO.File.Exists(filepath))
             {
+
+
+
                 SystemList = JsonConvert.DeserializeObject<ObservableCollection<PinballSystem>>(System.IO.File.ReadAllText(filepath));
             }
 
 
         }
 
+        private void SortSystemsTables()
+        {
+            try
+            {
 
+                foreach (PinballSystem ps in SystemList)
+                {
+                    TableList = new ObservableCollection<PinballTable>(TableList.OrderBy(i => i.Description));
+                }
+
+                SystemList = new ObservableCollection<PinballSystem>(SystemList.OrderBy(i => i.Name));
+
+
+            }
+            catch (Exception e)
+            {
+
+                logger.Error(e.ToString);
+            }
+        }
 
         private string GetOpenFile(string ext, string filter)
         {
@@ -207,6 +220,7 @@ namespace PinballFrontEnd.ViewModel
 
             return null;
         }
+        #endregion
 
     }
 }
