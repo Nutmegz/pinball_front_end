@@ -1,0 +1,38 @@
+﻿<Window x:Class="PinballFrontEnd.View.MediaView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PinballFrontEnd.View"
+        mc:Ignorable="d"
+        Title="MediaView"
+        x:Name="MediaViewWindow"
+        Background="Black"
+        IsVisibleChanged="MediaViewWindow_IsVisibleChanged">
+    <Grid>
+        <Image 
+            x:Name="VideoImage"
+            Stretch="Fill"
+            Panel.ZIndex="0"
+            Visibility="Visible"
+            />
+
+        <!--<Image
+            x:Name="PreloadImage"
+            
+            Source="{Binding Thumbnail,
+            NotifyOnSourceUpdated=True,
+            NotifyOnTargetUpdated=True, Mode=OneWay}" 
+            TargetUpdated="PreloadImage_SourceUpdated"
+            Stretch="Fill"
+            Visibility="Visible"/>-->
+
+        <Image
+            x:Name="PreloadImage"
+            TargetUpdated="PreloadImage_SourceUpdated"
+            SourceUpdated="PreloadImage_SourceUpdated"
+            Stretch="Fill"
+            Visibility="Visible"/>
+
+    </Grid>
+</Window>

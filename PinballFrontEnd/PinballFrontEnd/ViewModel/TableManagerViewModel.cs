@@ -11,7 +11,6 @@ using System.Windows.Input;
 using Newtonsoft.Json;
 using NLog;
 using System.Diagnostics;
-using DesktopWPFAppLowLevelKeyboardHook;
 using System.Text.RegularExpressions;
 
 namespace PinballFrontEnd.ViewModel

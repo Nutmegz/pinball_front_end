@@ -18,7 +18,7 @@ namespace PinballFrontEnd.Model
         [JsonIgnore]
         public bool PlayfieldVisable { get; set; } = true;
 
-        public int BackglassLocationX { get; set; } = 400;
+        public int BackglassLocationX { get; set; } = 500;
         public int BackglassLocationY { get; set; } = 0;
         public int BackglassSizeX { get; set; } = 400;
         public int BackglassSizeY { get; set; } = 400;
@@ -26,7 +26,7 @@ namespace PinballFrontEnd.Model
         [JsonIgnore]
         public bool BackglassVisable { get; set; } = true;
 
-        public int DMDLocationX { get; set; } = 800;
+        public int DMDLocationX { get; set; } = 1000;
         public int DMDLocationY { get; set; } = 0;
         public int DMDSizeX { get; set; } = 400;
         public int DMDSizeY { get; set; } = 400;

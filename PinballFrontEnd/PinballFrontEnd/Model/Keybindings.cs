@@ -16,6 +16,7 @@ namespace PinballFrontEnd.Model
         public Key KEYBIND_PREV { get; set; } = Key.Left;
         public Key KEYBIND_RAND { get; set; } = Key.F2;
         public Key KEYBIND_START { get; set; } = Key.Enter;
+        public Key KEYBIND_RECORD { get; set; } = Key.F4;
 
     }
 }

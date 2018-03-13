@@ -16,6 +16,7 @@
         TextOptions.TextRenderingMode="Auto"
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{DynamicResource MaterialDesignFont}"
+        
         >
 
 
@@ -140,9 +141,9 @@
 
                 
                 <DataGrid.Columns>
-                    <DataGridCheckBoxColumn 
+                    <!--<DataGridCheckBoxColumn 
                         Header="Enabled"
-                        Binding="{Binding Enabled}"/>
+                        Binding="{Binding Enabled}"/>-->
                     <DataGridTextColumn
                         Header="Table"
                         Binding="{Binding Description}" 
@@ -485,6 +486,8 @@
 
             </Grid>
 
+            
+            
             <!-- Table Information -->
             <Grid>
 
@@ -576,8 +579,182 @@
                      HorizontalAlignment="Stretch"
                      Text="{Binding SelectedItem.Year, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged}" />
 
-                <!-- Enabled -->
+
+                <!-- System -->
                 <TextBlock 
+                Grid.Row="6" 
+                Grid.Column="0"
+                HorizontalAlignment="Right" 
+                Text="System:" />
+                <ComboBox Grid.Row="6" 
+                     Grid.Column="1" 
+                     HorizontalAlignment="Stretch"
+                     ItemsSource="{Binding SystemList}"
+                     DisplayMemberPath="Name"
+                          
+                     SelectedValue="{Binding SelectedItem.System, ElementName=TableSelect}"
+                     SelectedValuePath="Name"
+                     />
+
+                <!-- Enabled -->
+                <Grid
+                    Grid.Row="7"
+                    Grid.Column="1">
+
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        Text="Enabled" />
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        Text="Hide DMD" />
+                    <TextBlock 
+                        Grid.Row="0"
+                        Grid.Column="2"
+                        HorizontalAlignment="Center"
+                        Text="Hide Backglass" />
+                    <CheckBox
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        IsChecked="{Binding SelectedItem.Enabled, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged}"
+                        />
+                    <CheckBox
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        IsChecked="{Binding SelectedItem.HideDMD, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged}"
+                        />
+                    <CheckBox
+                        Grid.Row="1"
+                        Grid.Column="2"
+                        HorizontalAlignment="Center"
+                        IsChecked="{Binding SelectedItem.HideBackglass, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged}"
+                        />
+
+
+                    <Border 
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Grid.RowSpan="5"
+                        Grid.ColumnSpan="3"
+                        Background="{DynamicResource MaterialDesignChipBackground}"
+                        BorderThickness="1"
+                        CornerRadius="16,16,16,16">
+                        
+                    </Border>
+                    
+                    <TextBlock
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="3"
+                        HorizontalAlignment="Center"
+                        Text="Media Audit" 
+                        FontWeight="ExtraBold"
+                        FontSize="20"
+                        />
+
+                    <TextBlock
+                        Grid.Row="3"
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        Text="Playfield" />
+                    <CheckBox
+                        Grid.Row="4"
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        IsHitTestVisible="false"
+                        IsChecked="{Binding SelectedItem.PlayfieldExists, ElementName=TableSelect, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                        />
+
+                    <TextBlock
+                        Grid.Row="3"
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        Text="Backglass" />
+                    <CheckBox
+                        Grid.Row="4"
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        IsHitTestVisible="false"
+                        IsChecked="{Binding SelectedItem.BackglassExists, ElementName=TableSelect, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                        />
+
+                    <TextBlock
+                        Grid.Row="3"
+                        Grid.Column="2"
+                        HorizontalAlignment="Center"
+                        Text="DMD" />
+                    <CheckBox
+                        Grid.Row="4"
+                        Grid.Column="2"
+                        HorizontalAlignment="Center"
+                        IsHitTestVisible="false"
+                        IsChecked="{Binding SelectedItem.DMDExists, ElementName=TableSelect, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                        />
+
+                    <TextBlock
+                        Grid.Row="5"
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        Text="Wheel" />
+                    <CheckBox
+                        Grid.Row="6"
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        IsHitTestVisible="false"
+                        IsChecked="{Binding SelectedItem.WheelExists, ElementName=TableSelect, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                        />
+
+                    <TextBlock
+                        Grid.Row="5"
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        Text="BG Music" />
+                    <CheckBox
+                        Grid.Row="6"
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        IsHitTestVisible="false"
+                        IsChecked="{Binding SelectedItem.BGMusicExists, ElementName=TableSelect, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                        />
+                    
+                    <TextBlock
+                        Grid.Row="5"
+                        Grid.Column="2"
+                        HorizontalAlignment="Center"
+                        Text="Launch Audio" />
+                    <CheckBox
+                        Grid.Row="6"
+                        Grid.Column="2"
+                        HorizontalAlignment="Center"
+                        IsHitTestVisible="false"
+                        IsChecked="{Binding SelectedItem.LMusicExists, ElementName=TableSelect, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                        />
+
+                </Grid>
+                <!--<TextBlock 
                 Grid.Row="6" 
                 Grid.Column="0"
                 HorizontalAlignment="Right" 
@@ -585,9 +762,9 @@
                 <CheckBox Grid.Row="6" 
                       Grid.Column="1" 
                       HorizontalAlignment="Stretch"
-                      IsChecked="{Binding SelectedItem.Enabled, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged}" />
+                      IsChecked="{Binding SelectedItem.Enabled, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged}" />-->
 
-                <!-- Playfield -->
+                <!-- Playfield --><!--
                 <TextBlock 
                 Grid.Row="7" 
                 Grid.Column="0"
@@ -599,7 +776,7 @@
                      IsReadOnly="True"
                      Text="{Binding SelectedItem.Playfield, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" />
 
-                <!-- Backglass -->
+                --><!-- Backglass --><!--
                 <TextBlock 
                 Grid.Row="8" 
                 Grid.Column="0"
@@ -611,7 +788,7 @@
                      IsReadOnly="True"
                      Text="{Binding SelectedItem.Backglass, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" />
 
-                <!-- DMD -->
+                --><!-- DMD --><!--
                 <TextBlock 
                 Grid.Row="9" 
                 Grid.Column="0"
@@ -623,7 +800,7 @@
                      IsReadOnly="True"
                      Text="{Binding SelectedItem.DMD, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" />
 
-                <!-- Wheel -->
+                --><!-- Wheel --><!--
                 <TextBlock 
                 Grid.Row="10" 
                 Grid.Column="0"
@@ -633,23 +810,9 @@
                      Grid.Column="1" 
                      HorizontalAlignment="Stretch"
                      IsReadOnly="True"
-                     Text="{Binding SelectedItem.Wheel, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" />
+                     Text="{Binding SelectedItem.Wheel, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" />-->
                 
-                <!-- System -->
-                <TextBlock 
-                Grid.Row="11" 
-                Grid.Column="0"
-                HorizontalAlignment="Right" 
-                Text="System:" />
-                <ComboBox Grid.Row="11" 
-                     Grid.Column="1" 
-                     HorizontalAlignment="Stretch"
-                     ItemsSource="{Binding SystemList}"
-                     DisplayMemberPath="Name"
-                          
-                     SelectedValue="{Binding SelectedItem.System, ElementName=TableSelect}"
-                     SelectedValuePath="Name"
-                     />
+                
 
 
             </Grid>

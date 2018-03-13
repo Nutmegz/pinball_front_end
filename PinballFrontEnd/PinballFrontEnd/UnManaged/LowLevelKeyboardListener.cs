@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
 
-namespace DesktopWPFAppLowLevelKeyboardHook
+namespace UnManaged
 {
     public class LowLevelKeyboardListener
     {
