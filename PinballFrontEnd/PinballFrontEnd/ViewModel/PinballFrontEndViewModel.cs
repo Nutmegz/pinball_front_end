@@ -34,12 +34,11 @@ namespace PinballFrontEnd.ViewModel
     public class PinballFrontEndViewModel : ViewModelBase
     {
 
-        /******************************************
-                  LOGGER
-        *******************************************/
-
         //Setup Class Logger
         private static Logger logger = LogManager.GetCurrentClassLogger();
+
+        //Database Path
+        private static string databasepath = $@"{ProgramPath.Value}\database.json";
 
         //Tell Windows to be on top
         public bool TopMost { get; set; } = true;
@@ -47,135 +46,134 @@ namespace PinballFrontEnd.ViewModel
         //Keybinding Statemachine
         public Mode RunMode { get; set; } = Mode.FrontEnd; // Start in front end mode
 
-
         //Table Manager Handle
         private View.TableManagerView tableManager;
 
         //Currently viewed table handle
         public PinballTable CurrentTable { get; set; } //Table where all media is played
 
-        public Visibility PlayfieldVisibility { get; set; } = Visibility.Visible;
-
-        public View.MediaView PlayfieldWindow { get; set; }
+        //Addon windows for the Backglass and DMD display
         public View.MediaView BackglassWindow { get; set; }
         public View.MediaView DMDWindow { get; set; }
 
+        //Visibilty property for main window
+        public Visibility PlayfieldVisibility { get; set; } = Visibility.Visible;
 
-        /******************************************
-                 Properties
-        ******************************************/
-        /// DATA
-
-
-        //Holds System Information
-        public ObservableCollection<PinballSystem> SystemList { get; set; } = new ObservableCollection<PinballSystem>();
-        //Hold Table Information
-        public ObservableCollection<PinballTable> TableList { get; set; } = new ObservableCollection<PinballTable>();
-
-        //Holds Display Information
-        public MediaLocation MediaLocation { get; set; } = new MediaLocation();
-
-        //Holds Keybindings
-        public Keybindings BIND { get; set; } = new Keybindings();
+        //Data
+        public PinballData Data { get; set; } = new PinballData();
 
         //Global Keyboard Listener Hook
         private LowLevelKeyboardListener _listener;
 
-        #region Database
 
-        //Load Database into memory
-        private void LoadDatabase()
+
+        //Default Constructor
+        public PinballFrontEndViewModel()
         {
-            var databasepath = $"{Model.ProgramPath.Value}database.json";
 
-            //If Database Exists
-            if (!System.IO.File.Exists(databasepath))
-            {
-                NewDatabase();
-            }
 
-            logger.Info($"Loading Database: {databasepath}");
-            //SystemList = JsonConvert.DeserializeObject<ObservableCollection<PinballSystem>>(System.IO.File.ReadAllText(databasepath));
-            StoreData storedata = JsonConvert.DeserializeObject<StoreData>(System.IO.File.ReadAllText(databasepath));
+            logger.Info($"Starting Pinball Front End: {Model.ProgramPath.Value}");
 
-            if (storedata.BIND != null)
-            {
-                BIND = storedata.BIND;
-            }
+            Data = new PinballData();
+            Data.LoadDatabase(databasepath);
 
-            if (storedata.SystemList != null)
-            {
-                SystemList = storedata.SystemList;
-            }
+            //InitializePlayers();
+            //LoadDatabase();
+            InitializeKeyboardHook();
+            InitalizeThumbnails();
+            InitializeBGMusic();
+            RandomTable();
+            InitalizeWindows();
 
-            if (storedata.TableList != null)
-            {
-                TableList = storedata.TableList;
-            }
+            //WindowControl.HideTaskbar();
+            //WindowControl.LockForground();
+        }
 
-            if (storedata.MediaLocation != null)
-            {
-                MediaLocation = storedata.MediaLocation;
-            }
+        //Startup addon windows
+        private void InitalizeWindows()
+        {
+
+            //BGMusicPlayer.IsMuted = false;
+
+            //Backglass Window
+            BackglassWindow = new View.MediaView();
+            BackglassWindow.WindowStyle = WindowStyle.None;
+            BackglassWindow.WindowStartupLocation = WindowStartupLocation.Manual;
+            BackglassWindow.ResizeMode = ResizeMode.NoResize;
+
+            BindWindow(BackglassWindow, Window.TopProperty, this, "Data.MediaLocation.BackglassLocationY", BindingMode.TwoWay);
+            BindWindow(BackglassWindow, Window.LeftProperty, this, "Data.MediaLocation.BackglassLocationX", BindingMode.TwoWay);
+            BindWindow(BackglassWindow, Window.HeightProperty, this, "Data.MediaLocation.BackglassSizeY", BindingMode.TwoWay);
+            BindWindow(BackglassWindow, Window.WidthProperty, this, "Data.MediaLocation.BackglassSizeX", BindingMode.TwoWay);
+            BindWindow(BackglassWindow, Window.TopmostProperty, this, "TopMost", BindingMode.TwoWay);
+            BindWindow(BackglassWindow, View.MediaView.MediaUriProperty, this, "CurrentTable.Backglass", BindingMode.OneWay);
+            BindWindow(BackglassWindow.PreloadImage, System.Windows.Controls.Image.SourceProperty, this, "CurrentTable.BackglassThumbnail", BindingMode.OneWay);
+
+            BackglassWindow.Show();
+
+            //DMD Window
+            DMDWindow = new View.MediaView();
+            DMDWindow.WindowStyle = WindowStyle.None;
+            DMDWindow.WindowStartupLocation = WindowStartupLocation.Manual;
+            DMDWindow.ResizeMode = ResizeMode.NoResize;
+
+            BindWindow(DMDWindow, Window.TopProperty, this, "Data.MediaLocation.DMDLocationY", BindingMode.TwoWay);
+            BindWindow(DMDWindow, Window.LeftProperty, this, "Data.MediaLocation.DMDLocationX", BindingMode.TwoWay);
+            BindWindow(DMDWindow, Window.HeightProperty, this, "Data.MediaLocation.DMDSizeY", BindingMode.TwoWay);
+            BindWindow(DMDWindow, Window.WidthProperty, this, "Data.MediaLocation.DMDSizeX", BindingMode.TwoWay);
+            BindWindow(DMDWindow, Window.TopmostProperty, this, "TopMost", BindingMode.TwoWay);
+            BindWindow(DMDWindow, View.MediaView.MediaUriProperty, this, "CurrentTable.DMD", BindingMode.OneWay);
+            BindWindow(DMDWindow.PreloadImage, System.Windows.Controls.Image.SourceProperty, this, "CurrentTable.DMDThumbnail", BindingMode.OneWay);
+
+            DMDWindow.Show();
 
         }
 
-        private void NewDatabase()
+        #region Window Property Binding
+
+        //Set Databinding
+        private void BindWindow(System.Windows.Controls.Image window, DependencyProperty property, Object source, String propertyPath, BindingMode mode)
         {
-            logger.Info("Database not found. Creating New Database");
-            BIND = new Model.Keybindings();
-            SystemList = new ObservableCollection<PinballSystem>();
-            TableList = new ObservableCollection<PinballTable>();
-            MediaLocation = new MediaLocation();
-
-            SaveDatabase();
 
 
-        }
 
-        //Save database to disk
-        private void SaveDatabase()
-        {
-            SortSystemsTables();
-            var databasepath = $"{Model.ProgramPath.Value}database.json";
-            logger.Info($"Saving Database: {databasepath}");
-            var storedata = new StoreData();
-            storedata.BIND = BIND;
-            storedata.TableList = TableList;
-            storedata.SystemList = SystemList;
-            storedata.MediaLocation = MediaLocation;
-            System.IO.File.WriteAllText(databasepath, JsonConvert.SerializeObject(storedata, Formatting.Indented));
-        }
-
-        //Sort systems and tables by name
-        private void SortSystemsTables()
-        {
-            try
+            Binding myBinding = new Binding()
             {
-                logger.Trace("Sorting Systems and Tables");
-                foreach (PinballSystem ps in SystemList)
-                {
-                    TableList = new ObservableCollection<PinballTable>(TableList.OrderBy(i => i.Description));
-                }
-
-                SystemList = new ObservableCollection<PinballSystem>(SystemList.OrderBy(i => i.Name));
-
-
-            }
-            catch (Exception e)
-            {
-
-                logger.Error(e.ToString);
-            }
+                Source = source,
+                Path = new PropertyPath(propertyPath),
+                Mode = mode,
+                NotifyOnSourceUpdated = true,
+                NotifyOnTargetUpdated = true
+            };
+            BindingOperations.SetBinding(window, property, myBinding);
         }
 
-        private PinballSystem FindSystem(PinballTable table)
+        private void BindWindow(Window window, DependencyProperty property, Object source, String propertyPath, BindingMode mode)
         {
-            return SystemList.Single(x => x.Name == table.System);
+
+
+
+            Binding myBinding = new Binding()
+            {
+                Source = source,
+                Path = new PropertyPath(propertyPath),
+                Mode = mode
+            };
+            BindingOperations.SetBinding(window, property, myBinding);
         }
+
+
+
 
         #endregion
 
+        private void InitializeKeyboardHook()
+        {
+            //Start Keyboard Listener (Removed Keylogger)
+            _listener = new LowLevelKeyboardListener();        //New Hook Object
+            _listener.OnKeyPressed += KeyboardListner_OnKeyPressed;  //Subscribe to Event
+            _listener.HookKeyboard();                          //Start Hook
+        }
 
         private void StartTableManager()
         {
@@ -189,14 +187,14 @@ namespace PinballFrontEnd.ViewModel
             StopBGMusic();
 
             TopMost = false;
-            tableManager = new View.TableManagerView(SystemList, TableList, MediaLocation);
+            tableManager = new View.TableManagerView(Data);
             WindowControl.ShowTaskbar();
             tableManager.Show();
         }
 
         private void ExitTableManager()
         {
-            SortSystemsTables();
+            Data.SortSystemsTables();
             logger.Trace($"{RunMode.ToString()} : Exit Table Manager");
 
             BackglassWindow.Visibility = Visibility.Visible;
@@ -212,7 +210,7 @@ namespace PinballFrontEnd.ViewModel
             logger.Trace($"Setting Mode to {RunMode.ToString()}");
         }
 
-        private void StartTable()
+        private async void StartTable()
         {
             logger.Info($"{RunMode.ToString()}: Starting table: {CurrentTable.Name}");
 
@@ -220,9 +218,8 @@ namespace PinballFrontEnd.ViewModel
             LMusicPlayer.Open(CurrentTable.LMusic);
             LMusicPlayer.Play();
 
-
-
-            var system = FindSystem(CurrentTable);
+            //Get Assosiated System to Launch
+            var system = Data.FindSystem(CurrentTable);
 
             //Replace [TABLENAME]
             var regex = new Regex(@"\[TABLENAME\]");
@@ -236,6 +233,8 @@ namespace PinballFrontEnd.ViewModel
             //TopMost = true;
 
             logger.Debug(param);
+
+            //Setup Process to launch
             var proc = new Process();
             proc.StartInfo.FileName = system.WorkingPath + "\\" + system.Executable;
             proc.StartInfo.Arguments = param;
@@ -253,50 +252,59 @@ namespace PinballFrontEnd.ViewModel
             watchdog.Start();
 
             //Mute Process
-            //Hunt for process
+            //Hunt for system process (Allows us to find the Steam Game since original process is steam)
             int gameID = 0;
             //Console.WriteLine(game.Id);
-            while (gameID == 0)
+
+            await Task.Run(() =>
             {
-                var procs = Process.GetProcesses();
-                foreach (Process procy in procs)
+                while (gameID == 0)
                 {
-                    //Console.WriteLine(procy.ProcessName);
-                    if (procy.ProcessName.IndexOf(FindSystem(CurrentTable).Name, 0, StringComparison.CurrentCultureIgnoreCase) > -1)
+                    var procs = Process.GetProcesses();
+                    foreach (Process procy in procs)
                     {
-                        gameID = procy.Id;
-                        logger.Info($"Found Program: {FindSystem(CurrentTable).Name.ToLower()}");
-                        break;
-                    }
-                    if (watchdog.ElapsedMilliseconds > 10000)
-                    {
-                        logger.Error("Can't Find System Process");
-                        break;
+                        //Console.WriteLine(procy.ProcessName);
+                        if (procy.ProcessName.IndexOf(Data.FindSystem(CurrentTable).Name, 0, StringComparison.CurrentCultureIgnoreCase) > -1)
+                        {
+                            gameID = procy.Id;
+                            logger.Info($"Found Program: {Data.FindSystem(CurrentTable).Name.ToLower()}");
+                            break;
+                        }
+                        if (watchdog.ElapsedMilliseconds > 10000)
+                        {
+                            logger.Error("Can't Find System Process");
+                            break;
+                        }
                     }
                 }
-            }
+            });
 
 
 
-            //Try and Mute
+
+            //Try and Mute System
             watchdog.Restart();
             logger.Info("Muting System");
-            while (VolumeMixer.GetApplicationMute(gameID) != true)
+            await Task.Run(() =>
             {
-                //Console.WriteLine("Trying to Mute");
-                VolumeMixer.SetApplicationMute(gameID, true);
-                WindowControl.SetFocus("Pinball Front End");
-                if (watchdog.ElapsedMilliseconds > 10000)
-                {
-                    logger.Error("Can't Mute System");
-                    break;
-                }
-            }
+               while (VolumeMixer.GetApplicationMute(gameID) != true)
+               {
+                   //Console.WriteLine("Trying to Mute");
+                   VolumeMixer.SetApplicationMute(gameID, true);
+                   WindowControl.SetFocus("Pinball Front End");
+                   if (watchdog.ElapsedMilliseconds > 10000)
+                   {
+                       logger.Error("Can't Mute System");
+                       break;
+                   }
+               }
+            });
 
 
 
 
-            Thread.Sleep(system.WaitTime * 1000); // sleep
+
+            await Task.Run(() => Task.Delay(system.WaitTime * 1000)); // sleep (Need to update to keep videos playing)
             BGMusicPlayer.Pause();
 
             //Unmute
@@ -322,8 +330,8 @@ namespace PinballFrontEnd.ViewModel
 
             //Hide Selected Windows
             logger.Trace("Setting Window Visibility");
-            BackglassWindow.Visibility = CurrentTable.HideBackglass ? Visibility.Hidden : Visibility.Visible;
-            DMDWindow.Visibility = CurrentTable.HideDMD ? Visibility.Hidden : Visibility.Visible;
+            BackglassWindow.Visibility = CurrentTable.ShowBackglass ? Visibility.Visible : Visibility.Hidden;
+            DMDWindow.Visibility = CurrentTable.ShowDMD ? Visibility.Visible : Visibility.Hidden;
             //PlayfieldWindow.Visibility = Visibility.Hidden;
             PlayfieldVisibility = Visibility.Hidden;
 
@@ -341,9 +349,9 @@ namespace PinballFrontEnd.ViewModel
                 foreach (Process proc in procs)
                 {
                     //Console.WriteLine(proc.ProcessName);
-                    if (proc.ProcessName.IndexOf(FindSystem(CurrentTable).Name, 0, StringComparison.CurrentCultureIgnoreCase) > -1)
+                    if (proc.ProcessName.IndexOf(Data.FindSystem(CurrentTable).Name, 0, StringComparison.CurrentCultureIgnoreCase) > -1)
                     {
-                        logger.Info($"Ending Program: {FindSystem(CurrentTable).Name.ToLower()}");
+                        logger.Info($"Ending Program: {Data.FindSystem(CurrentTable).Name.ToLower()}");
                         proc.Kill();
 
                     }
@@ -377,20 +385,11 @@ namespace PinballFrontEnd.ViewModel
             }
         }
 
-        private void InitializeKeyboardHook()
-        {
-            //Start Keyboard Listener (Removed Keylogger)
-            _listener = new LowLevelKeyboardListener();        //New Hook Object
-            _listener.OnKeyPressed += KeyboardListner_OnKeyPressed;  //Subscribe to Event
-            _listener.HookKeyboard();                          //Start Hook
-        }
-
-
         //Handle Keyboard Message
         private void KeyboardListner_OnKeyPressed(object sender, KeyPressedArgs e)
         {
             //EXIT KEY
-            if (e.KeyPressed == BIND.KEYBIND_EXIT)
+            if (e.KeyPressed == Data.BIND.KEYBIND_EXIT)
             {
                 switch (RunMode)
                 {
@@ -407,7 +406,7 @@ namespace PinballFrontEnd.ViewModel
             }
 
             //START KEY
-            if (e.KeyPressed == BIND.KEYBIND_START)
+            if (e.KeyPressed == Data.BIND.KEYBIND_START)
             {
                 switch (RunMode)
                 {
@@ -418,7 +417,7 @@ namespace PinballFrontEnd.ViewModel
             }
 
             //NEXT KEY
-            if (e.KeyPressed == BIND.KEYBIND_NEXT)
+            if (e.KeyPressed == Data.BIND.KEYBIND_NEXT)
             {
                 switch (RunMode)
                 {
@@ -429,7 +428,7 @@ namespace PinballFrontEnd.ViewModel
             }
 
             //PREV KEY
-            if (e.KeyPressed == BIND.KEYBIND_PREV)
+            if (e.KeyPressed == Data.BIND.KEYBIND_PREV)
             {
                 switch (RunMode)
                 {
@@ -440,7 +439,7 @@ namespace PinballFrontEnd.ViewModel
             }
 
             //RAND KEY
-            if (e.KeyPressed == BIND.KEYBIND_RAND)
+            if (e.KeyPressed == Data.BIND.KEYBIND_RAND)
             {
                 switch (RunMode)
                 {
@@ -451,7 +450,7 @@ namespace PinballFrontEnd.ViewModel
             }
 
             //TABLE MANAGER KEY
-            if (e.KeyPressed == BIND.KEYBIND_TABLEMANAGER)
+            if (e.KeyPressed == Data.BIND.KEYBIND_TABLEMANAGER)
             {
                 switch (RunMode)
                 {
@@ -462,7 +461,7 @@ namespace PinballFrontEnd.ViewModel
             }
 
             //RECORD KEY
-            if (e.KeyPressed == BIND.KEYBIND_RECORD)
+            if (e.KeyPressed == Data.BIND.KEYBIND_RECORD)
             {
                 switch (RunMode)
                 {
@@ -474,22 +473,19 @@ namespace PinballFrontEnd.ViewModel
             //DO NOTHING TO OTHER KEYS TO AVOID KEYLOGGER FUNCTION
         }
 
-
-
+        //Exit Program
         private void ExitFrontEnd()
         {
-            SaveDatabase();
+            Data.SaveDatabase(databasepath);
             logger.Info($"{RunMode.ToString()} : Exit Front End");
             _listener.UnHookKeyboard(); //Unregister keyboard hook
             WindowControl.ShowTaskbar();
             System.Windows.Application.Current.Shutdown(); //Shut program down
         }
 
+        #region MediaRecording (NOT USED RIGHT NOW)
 
-
-
-        #region MediaRecording
-
+        //Start NVIDIA SHADOW PLAY
         private void RecordMedia1()
         {
             System.Windows.Forms.SendKeys.SendWait("%{F9}");
@@ -503,7 +499,7 @@ namespace PinballFrontEnd.ViewModel
             if (System.IO.File.Exists(ffmpeg_path))
             {
                 //create parameters
-                //string playfieldRecordParam = $"-y -t 10 -rtbufsize 1500M -f gdigrab -framerate 60 -offset_x {MediaLocation.PlayfieldLocationX} -offset_y {MediaLocation.PlayfieldLocationY} -video_size {MediaLocation.PlayfieldSizeX}x{MediaLocation.PlayfieldSizeY} -i desktop -c:v h264_nvenc -qp 0 -threads 8 \"{Model.ProgramPath.Value}temp\\{CurrentTable.Description}.mp4\"";
+                //string playfieldRecordParam = $"-y -t 10 -rtbufsize 1500M -f gdigrab -framerate 60 -offset_x {Data.MediaLocation.PlayfieldLocationX} -offset_y {Data.MediaLocation.PlayfieldLocationY} -video_size {Data.MediaLocation.PlayfieldSizeX}x{Data.MediaLocation.PlayfieldSizeY} -i desktop -c:v h264_nvenc -qp 0 -threads 8 \"{Model.ProgramPath.Value}temp\\{CurrentTable.Description}.mp4\"";
 
                 //string playfieldRecordParam = $"-y -t 10 -rtbufsize 500M -f gdigrab -framerate 60 -offset_x 0 -offset_y 0 -video_size 3440x1440 -i desktop -c:v h264_nvenc -preset lossless -profile high444p \"{Model.ProgramPath.Value}temp\\{CurrentTable.Description}.mp4\"";
 
@@ -513,9 +509,9 @@ namespace PinballFrontEnd.ViewModel
 
 
                 //latest
-                //string playfieldRecordParam = $"-y -framerate 60 -probesize 100M -rtbufsize 1500M -f gdigrab -offset_x {MediaLocation.PlayfieldLocationX} -offset_y {MediaLocation.PlayfieldLocationY} -video_size {MediaLocation.PlayfieldSizeX}x{MediaLocation.PlayfieldSizeY} -i desktop -t 30 -c:v h264_nvenc -profile:v high -preset losslesshp \"{Model.ProgramPath.Value}temp\\{CurrentTable.Description}.mp4\"";
+                //string playfieldRecordParam = $"-y -framerate 60 -probesize 100M -rtbufsize 1500M -f gdigrab -offset_x {Data.MediaLocation.PlayfieldLocationX} -offset_y {Data.MediaLocation.PlayfieldLocationY} -video_size {Data.MediaLocation.PlayfieldSizeX}x{Data.MediaLocation.PlayfieldSizeY} -i desktop -t 30 -c:v h264_nvenc -profile:v high -preset losslesshp \"{Model.ProgramPath.Value}temp\\{CurrentTable.Description}.mp4\"";
 
-                string playfieldRecordParam = $"-y -framerate 60 -probesize 100M -rtbufsize 1500M -f gdigrab -offset_x {MediaLocation.PlayfieldLocationX} -offset_y {MediaLocation.PlayfieldLocationY} -video_size {MediaLocation.PlayfieldSizeX}x{MediaLocation.PlayfieldSizeY} -i desktop -t 30 -c:v h264_nvenc -profile:v high -preset losslesshp \"{Model.ProgramPath.Value}temp\\{CurrentTable.Description}.mp4\"";
+                string playfieldRecordParam = $"-y -framerate 60 -probesize 100M -rtbufsize 1500M -f gdigrab -offset_x {Data.MediaLocation.PlayfieldLocationX} -offset_y {Data.MediaLocation.PlayfieldLocationY} -video_size {Data.MediaLocation.PlayfieldSizeX}x{Data.MediaLocation.PlayfieldSizeY} -i desktop -t 30 -c:v h264_nvenc -profile:v high -preset losslesshp \"{Model.ProgramPath.Value}temp\\{CurrentTable.Description}.mp4\"";
 
 
                 Console.WriteLine(playfieldRecordParam);
@@ -540,242 +536,17 @@ namespace PinballFrontEnd.ViewModel
 
         #endregion
 
-
-        //Default Constructor
-        public PinballFrontEndViewModel()
+        //Loads thumbnails of all tables into memory
+        private void InitalizeThumbnails()
         {
-
-
-            logger.Info($"Starting Pinball Front End: {Model.ProgramPath.Value}");
-            //InitializePlayers();
-            LoadDatabase();
-            InitializeKeyboardHook();
-            InitalizeThumbnails();
-            InitializeBGMusic();
-            RandomTable();
-
-
-
-            InitalizeWindows();
-
-            //WindowControl.HideTaskbar();
-            //WindowControl.LockForground();
-
-
-        }
-
-        private void InitalizeWindows()
-        {
-            //Playfield Window
-            //PlayfieldWindow = new View.MediaView();
-            //PlayfieldWindow.WindowStyle = WindowStyle.None;
-            //PlayfieldWindow.WindowStartupLocation = WindowStartupLocation.Manual;
-            //PlayfieldWindow.ResizeMode = ResizeMode.NoResize;
-
-            BGMusicPlayer.IsMuted = false;
-
-            //NewWindow();
-
-            //PlayfieldWindow.ShowActivated = false;
-            //PlayfieldWindow.WindowState = WindowState.Maximized;
-
-            //BindWindow(PlayfieldWindow, Window.TopProperty, this, "MediaLocation.PlayfieldLocationY", BindingMode.TwoWay);
-            //BindWindow(PlayfieldWindow, Window.LeftProperty, this, "MediaLocation.PlayfieldLocationX", BindingMode.TwoWay);
-            //BindWindow(PlayfieldWindow, Window.HeightProperty, this, "MediaLocation.PlayfieldSizeY", BindingMode.TwoWay);
-            //BindWindow(PlayfieldWindow, Window.WidthProperty, this, "MediaLocation.PlayfieldSizeX", BindingMode.TwoWay);
-            //BindWindow(PlayfieldWindow, Window.BackgroundProperty, this, "PlayfieldBrush", BindingMode.OneWay);
-            //BindWindow(PlayfieldWindow, Window.BackgroundProperty, this, "PlayfieldBrush", BindingMode.OneWay);
-            //BindWindow(PlayfieldWindow, Window.TopmostProperty, this, "TopMost", BindingMode.TwoWay);
-            //BindWindow(PlayfieldWindow, Window.VisibilityProperty, this, "PlayfieldVisibility");
-
-            //PlayfieldWindow.Show();
-
-            //Backglass Window
-            BackglassWindow = new View.MediaView();
-            BackglassWindow.WindowStyle = WindowStyle.None;
-            BackglassWindow.WindowStartupLocation = WindowStartupLocation.Manual;
-            BackglassWindow.ResizeMode = ResizeMode.NoResize;
-            //BackglassWindow.WindowState = WindowState.Maximized;
-            //BackglassWindow.DataContext = this;
-
-            BindWindow(BackglassWindow, Window.TopProperty, this, "MediaLocation.BackglassLocationY", BindingMode.TwoWay);
-            BindWindow(BackglassWindow, Window.LeftProperty, this, "MediaLocation.BackglassLocationX", BindingMode.TwoWay);
-            BindWindow(BackglassWindow, Window.HeightProperty, this, "MediaLocation.BackglassSizeY", BindingMode.TwoWay);
-            BindWindow(BackglassWindow, Window.WidthProperty, this, "MediaLocation.BackglassSizeX", BindingMode.TwoWay);
-            //BindWindow(BackglassWindow, Window.BackgroundProperty, this, "BackglassBrush", BindingMode.OneWay);
-            BindWindow(BackglassWindow, Window.TopmostProperty, this, "TopMost", BindingMode.TwoWay);
-            BindWindow(BackglassWindow, View.MediaView.MediaUriProperty, this, "CurrentTable.Backglass", BindingMode.OneWay);
-            //BindWindow(BackglassWindow, View.MediaView.ThumbnailProperty, this, "CurrentTable.BackglassThumbnail", BindingMode.TwoWay);
-            BindWindow(BackglassWindow.PreloadImage, System.Windows.Controls.Image.SourceProperty, this, "CurrentTable.BackglassThumbnail", BindingMode.OneWay);
-            //BackglassWindow.Thumbnail = CurrentTable.BackglassThumbnail;
-            //BindWindow(BackglassWindow, BackglassWindow.PreloadImage.Source, this, "CurrentTable.Backglass", BindingMode.OneWay);
-
-            //BindWindow(BackglassWindow, Window.VisibilityProperty, this, "BackglassVisibility");
-
-            BackglassWindow.Show();
-
-            //DMD Window
-            DMDWindow = new View.MediaView();
-            DMDWindow.WindowStyle = WindowStyle.None;
-            DMDWindow.WindowStartupLocation = WindowStartupLocation.Manual;
-            DMDWindow.ResizeMode = ResizeMode.NoResize;
-            //DMDWindow.DataContext = this;
-
-            BindWindow(DMDWindow, Window.TopProperty, this, "MediaLocation.DMDLocationY", BindingMode.TwoWay);
-            BindWindow(DMDWindow, Window.LeftProperty, this, "MediaLocation.DMDLocationX", BindingMode.TwoWay);
-            BindWindow(DMDWindow, Window.HeightProperty, this, "MediaLocation.DMDSizeY", BindingMode.TwoWay);
-            BindWindow(DMDWindow, Window.WidthProperty, this, "MediaLocation.DMDSizeX", BindingMode.TwoWay);
-            //BindWindow(DMDWindow, Window.BackgroundProperty, this, "DMDBrush", BindingMode.OneWay);
-            BindWindow(DMDWindow, Window.TopmostProperty, this, "TopMost", BindingMode.TwoWay);
-            BindWindow(DMDWindow, View.MediaView.MediaUriProperty, this, "CurrentTable.DMD", BindingMode.OneWay);
-            //BindWindow(DMDWindow, View.MediaView.ThumbnailProperty, this, "CurrentTable.DMDThumbnail", BindingMode.OneWay);
-            BindWindow(DMDWindow.PreloadImage, System.Windows.Controls.Image.SourceProperty, this, "CurrentTable.DMDThumbnail", BindingMode.OneWay);
-            //DMDWindow.Thumbnail = CurrentTable.DMDThumbnail;
-            //BindWindow(DMDWindow, Window.VisibilityProperty, this, "DMDVisibility");
-
-            DMDWindow.Show();
-
-        }
-
-        #region Window Property Binding
-
-        private void BindWindow(System.Windows.Controls.Image window, DependencyProperty property, Object source, String propertyPath, BindingMode mode)
-        {
-
-
-
-            Binding bind = new Binding()
+            logger.Info($"{RunMode.ToString()} : Loading Thumbnails");
+            foreach (PinballTable pt in Data.TableList)
             {
-                Source = source,
-                Path = new PropertyPath(propertyPath),
-                Mode = mode,
-                NotifyOnSourceUpdated = true,
-                NotifyOnTargetUpdated = true
-            };
-            BindingOperations.SetBinding(window, property, bind);
-        }
-
-        private void BindWindow(Window window, DependencyProperty property, Object source, String propertyPath, BindingMode mode)
-        {
-
-
-
-            Binding bind = new Binding()
-            {
-                Source = source,
-                Path = new PropertyPath(propertyPath),
-                Mode = mode
-            };
-            BindingOperations.SetBinding(window, property, bind);
-        }
-
-
-
-
-        #endregion
-
-        #region Table Select
-
-
-        /// <summary>
-        /// Return a handle to the next table in the tablelist
-        /// </summary>
-        /// <param name="table"></param>
-        /// <returns></returns>
-        private PinballTable NextTable(PinballTable table)
-        {
-            var pinballtable = TableList.ElementAt(TableList.IndexOf(table) < TableList.Count() - 1 ? TableList.IndexOf(table) + 1 : 0);
-            if (pinballtable.Enabled)
-            {
-                return pinballtable;
-            }
-            else
-            {
-                //Ignore Disabled Tables
-                return NextTable(pinballtable);
-            }
-
-        }
-
-
-        /// <summary>
-        /// Return a handle to the next table + advance in the table list
-        /// </summary>
-        /// <param name="table"></param>
-        /// <param name="advance"></param>
-        /// <returns></returns>
-        private PinballTable NextTable(PinballTable table, int advance)
-        {
-            //Console.WriteLine($"Next Table: {table.Description} -> {advance}");
-            if (advance > 0)
-            {
-                return NextTable(NextTable(table), advance - 1);
-            }
-
-            return table;
-        }
-
-
-        /// <summary>
-        /// Returns a handle to the prev table in the tablelist
-        /// </summary>
-        /// <param name="table"></param>
-        /// <returns></returns>
-        private PinballTable PrevTable(PinballTable table)
-        {
-            var pinballtable = TableList.ElementAt(TableList.IndexOf(table) > 0 ? TableList.IndexOf(table) - 1 : TableList.Count() - 1);
-            if (pinballtable.Enabled)
-            {
-                return pinballtable;
-            }
-            else
-            {
-                //Ignore Disabled Tables
-                return PrevTable(pinballtable);
+                pt.loadThumbnails(Data.MediaLocation.ThumbnailResolution);
             }
         }
 
-
-        /// <summary>
-        /// Returns a hndle to the prev table - advance in the tablelist
-        /// </summary>
-        /// <param name="table"></param>
-        /// <param name="advance"></param>
-        /// <returns></returns>
-        private PinballTable PrevTable(PinballTable table, int advance)
-        {
-            //Console.WriteLine($"Prev Table: {table.Description} -> {advance}");
-            if (advance > 0)
-            {
-                return PrevTable(PrevTable(table), advance - 1);
-            }
-
-            return table;
-        }
-
-        /// <summary>
-        /// Select a randome table from the TableList
-        /// </summary>
-        private void RandomTable()
-        {
-            logger.Info($"{RunMode.ToString()} : Random Table");
-            if (TableList.Count > 0)
-            {
-                //Select Random table
-                Random rnd = new Random();
-                CurrentTable = TableList.ElementAt(rnd.Next(0, TableList.Count));
-                //Update Background Music
-                ChangeBGMusic();
-            }
-
-
-        }
-
-
-        #endregion
-
-
-
+        #region Background / Play Music
 
         //Audio Players
         public MediaPlayer BGMusicPlayer { get; set; } = new MediaPlayer();  //Background Music
@@ -795,25 +566,11 @@ namespace PinballFrontEnd.ViewModel
             mp.Play();
         }
 
-
-
-
-        //Loads thumbnails of all tables into memory
-        private void InitalizeThumbnails()
-        {
-            logger.Info($"{RunMode.ToString()} : Loading Thumbnails");
-            foreach (PinballTable pt in TableList)
-            {
-                pt.loadThumbnails();
-            }
-        }
-
-        #region Background Music
-
         //Change Background Music to the current table
         private void ChangeBGMusic()
         {
             BGMusicPlayer.Stop();
+            if (CurrentTable != null)
             if (CurrentTable.BGMusicExists)
             {
                 BGMusicPlayer.Open(CurrentTable.BGMusic);
@@ -829,31 +586,40 @@ namespace PinballFrontEnd.ViewModel
 
         private void ResumeBGMusic()
         {
+            if (CurrentTable != null)
             if (CurrentTable.BGMusicExists)
                 BGMusicPlayer.Play();
         }
 
         #endregion
 
+        #region Table Select
 
-
-        //Stat Machine to select next table
+        //Select Next Table
         private void NextTable()
         {
             logger.Info($"{RunMode.ToString()} : Next Table");
-            CurrentTable = NextTable(CurrentTable);
+            CurrentTable = Data.NextTable(CurrentTable);
             ChangeBGMusic();
         }
 
-        //Stat Machine to select next table
+        //Select Previous Table
         private void PrevTable()
         {
-            logger.Info($"{RunMode.ToString()} : Prev Table");
-            CurrentTable = PrevTable(CurrentTable);
+            logger.Info($"{RunMode.ToString()} : Previous Table");
+            CurrentTable = Data.PrevTable(CurrentTable);
             ChangeBGMusic();
         }
 
+        //Select Random Table
+        private void RandomTable()
+        {
+            logger.Info($"{RunMode.ToString()} : Random Table");
+            CurrentTable = Data.RandomTable();
+            ChangeBGMusic();
+        }
 
+        #endregion
 
     }
 

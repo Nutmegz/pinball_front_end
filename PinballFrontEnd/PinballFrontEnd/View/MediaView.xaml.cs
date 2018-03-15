@@ -18,10 +18,8 @@ using System.ComponentModel;
 
 namespace PinballFrontEnd.View
 {
-    /// <summary>
-    /// Interaction logic for MediaView.xaml
-    /// </summary>
-    public partial class MediaView : Window, INotifyPropertyChanged
+
+    public partial class MediaView : Window
     {
 
 
@@ -31,9 +29,6 @@ namespace PinballFrontEnd.View
 
         //VLC
         private VlcVideoSourceProvider sourceProvider;
-        private string[] mediaOptions;
-
-        //public Model.PinballTable CurrentTable { get; set; }
 
         public Uri MediaUri
         {
@@ -48,37 +43,7 @@ namespace PinballFrontEnd.View
                 typeof(MediaView));
 
 
-        public BitmapImage Thumbnail
-        {
-            get { return (BitmapImage)GetValue(ThumbnailProperty); }
-            set { SetValue(ThumbnailProperty, value); }
-        }
 
-        //public static readonly DependencyProperty ThumbnailProperty =
-        //    DependencyProperty.Register(
-        //        "Thumbnail",
-        //        typeof(BitmapImage),
-        //        typeof(MediaView),
-        //        new PropertyMetadata(null,new PropertyChangedCallback(ThumbnailChanged)));
-
-        public static readonly DependencyProperty ThumbnailProperty = DependencyProperty.Register(
-        "Thumbnail",
-        typeof(BitmapImage),
-        typeof(MediaView));
-
-        //private void ThumbnailChanged(DependencyPropertyChangedEventArgs e)
-        //{
-        //    Thumbnail = (BitmapImage)e.NewValue;
-        //}
-
-        //private static void ThumbnailChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        //{
-        //    MediaView mv = d as MediaView;
-        //    mv.ThumbnailChanged(e);
-        //}
-
-        //public ViewModel.PinballFrontEndViewModel myView { get; set; }
-        //private ViewModel.PinballFrontEndViewModel myView;
 
         public MediaView()
         {
@@ -105,35 +70,16 @@ namespace PinballFrontEnd.View
             showTimer.Start();
 
 
-            ///////////////////////////////////////////////////////////////////////////////////////////////////
+
             // SETUP VLC LIBRARY
-            ///////////////////////////////////////////////////////////////////////////////////////////////////
-            var currentAssembly = System.Reflection.Assembly.GetEntryAssembly();
-            var currentDirectory = new FileInfo(currentAssembly.Location).DirectoryName;
-            DirectoryInfo libDirectory;
-
-            // Default libraries are stored here, but they are old, don't use them.
-            // We need a better way to install them, see https://github.com/ZeBobo5/Vlc.DotNet/issues/288
-            if (IntPtr.Size == 4)
-                libDirectory = new DirectoryInfo(Path.Combine(currentDirectory, @"libvlc\x86\"));
-            else
-                libDirectory = new DirectoryInfo(Path.Combine(currentDirectory, @"libvlc\x64\"));
-
+        
             //Create Video Source Provider
             sourceProvider = new VlcVideoSourceProvider(this.Dispatcher);
-            sourceProvider.CreatePlayer(libDirectory);
+            sourceProvider.CreatePlayer(Model.VlcGlobal.GetVlcLibrary());
             sourceProvider.MediaPlayer.Playing += MediaPlayer_Playing;
 
             //Bind source provider to image
             VideoImage.SetBinding(Image.SourceProperty, new Binding(nameof(VlcVideoSourceProvider.VideoSource)) { Source = sourceProvider });
-
-            mediaOptions = new string[]
-            {
-                "--input-repeat=2147483647",
-                "--no-audio",
-                "--no-video-on-top"
-            };
-
         }
 
 
@@ -157,7 +103,7 @@ namespace PinballFrontEnd.View
                 Dispatcher.Invoke(() => ShowTimer_Elapsed(sender, e));
                 return;
             }
-            Console.WriteLine("Visibility Timer Tick");
+            //Console.WriteLine("Visibility Timer Tick");
 
             //TestMe.Visibility = Visibility.Visible;
             PreloadImage.Visibility = Visibility.Hidden;
@@ -173,10 +119,8 @@ namespace PinballFrontEnd.View
                 return;
             }
 
-            //this.VlcControl.SourceProvider.MediaPlayer.Play(viewModel.CurrentTable.Playfield, mediaOptions);
             if (MediaUri != null && File.Exists(MediaUri.LocalPath))
-                sourceProvider.MediaPlayer.Play(MediaUri, mediaOptions);
-            Console.WriteLine("RawR");
+                sourceProvider.MediaPlayer.Play(MediaUri, Model.VlcGlobal.GetVlcArguments());
         }
 
         #endregion
@@ -206,15 +150,6 @@ namespace PinballFrontEnd.View
 
         #endregion
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void NotifyPropertyChanged(String propertyname)
-        {
-            if (this.PropertyChanged != null)
-            {
-                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyname));
-            }
-        }
 
         //Stop and Play videos when hiding window to free up resources.
         private void MediaViewWindow_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)

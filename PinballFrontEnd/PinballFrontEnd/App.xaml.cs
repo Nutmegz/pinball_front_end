@@ -15,8 +15,25 @@ namespace PinballFrontEnd
     {
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            var MainProgram = new View.PinballFrontEndView();
-            MainProgram.Show();
+            if(e.Args.Length > 0)
+            {
+                foreach (string arg in e.Args)
+                {
+                    switch(arg)
+                    {
+                        case "tablemanager":
+                            var TableManager = new View.TableManagerView($@"{Model.ProgramPath.Value}\database.json");
+                            TableManager.Show();
+                            break;
+                    }
+                }
+            } else
+            {
+                //No Arguments, Start Main Program
+                var MainProgram = new View.PinballFrontEndView();
+                MainProgram.Show();
+            }
+           
         }
     }
 }

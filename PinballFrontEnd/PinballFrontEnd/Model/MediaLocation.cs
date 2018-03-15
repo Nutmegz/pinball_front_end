@@ -10,6 +10,8 @@ namespace PinballFrontEnd.Model
 {
     public class MediaLocation : INotifyPropertyChanged
     {
+        public int ThumbnailResolution { get; set; } = 0;
+
         public int PlayfieldLocationX { get; set; } = 0;
         public int PlayfieldLocationY { get; set; } = 0;
         public int PlayfieldSizeX { get; set; } = 400;
@@ -33,6 +35,41 @@ namespace PinballFrontEnd.Model
         public int DMDRotation { get; set; } = 0;
         [JsonIgnore]
         public bool DMDVisable { get; set; } = true;
+
+        [JsonIgnore]
+        public int WheelSizeXY
+        {
+            get
+            {
+                return (int)(PlayfieldSizeX * 0.25);
+            }
+        }
+        [JsonIgnore]
+        public int WheelLocationY
+        {
+            get
+            {
+                return (int)((PlayfieldSizeY * 0.5) - WheelSizeXY);
+            }
+        }
+        [JsonIgnore]
+        public int WheelLocationX
+        {
+            get
+            {
+                return (int)((PlayfieldSizeX * .75));
+            }
+        }
+        [JsonIgnore]
+        public int WheelRotation
+        {
+            get
+            {
+                return (int)(PlayfieldRotation + 90);
+            }
+        }
+
+
 
 
         public event PropertyChangedEventHandler PropertyChanged;

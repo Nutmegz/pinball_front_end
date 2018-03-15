@@ -40,8 +40,10 @@ namespace PinballFrontEnd.View
 
         #region PFE
 
+        //Array of Strings to hold VLC player options
         private string[] mediaOptions;
 
+        //VLC Source provider (Video Player)
         private VlcVideoSourceProvider sourceProvider;
 
         public PinballFrontEndView()
@@ -120,7 +122,7 @@ namespace PinballFrontEnd.View
             PreventSleep();
         }
 
-
+        /// Controls the playback of the video depending if the window is visible or not
         private void pfe_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             var win = (Window)sender;
@@ -138,6 +140,7 @@ namespace PinballFrontEnd.View
 
         }
 
+        // Keep Main Window Focused
         private void pfe_LostFocus(object sender, RoutedEventArgs e)
         {
             logger.Error("FOCUS LOST SETTING FOCUS");
@@ -148,31 +151,23 @@ namespace PinballFrontEnd.View
 
         #region Preload Image Actions
 
+        //Show new preload image when loaded and start a play video timer
         private void PreloadImage_SourceUpdated(object sender, DataTransferEventArgs e)
         {
-            //vidTimer.
+            //Get Image Handle
             var im = (Image)sender;
-            im.Visibility = Visibility.Visible;
-            //Console.WriteLine("Image Changed");
+            im.Visibility = Visibility.Visible; //Make Preload Image Visiable
 
-            //TestMe.Source = viewModel.CurrentTable.Playfield;
-            //CurrentSource = viewModel.CurrentTable.Playfield;
-
-
-            //Console.WriteLine("Reset Timer");
-            //Media.Stop();
-            //Media.Visibility = Visibility.Hidden;
+            //Reset Video Timer
             vidTimer.Stop();
             vidTimer.Start();
-
-            //Console.WriteLine(vidTimer.Enabled);
-
         }
 
         #endregion
 
         #region MediaPlayer Actions
 
+        //Start a video visibility timer when the VLC player start playing
         private void MediaPlayer_Playing(object sender, Vlc.DotNet.Core.VlcMediaPlayerPlayingEventArgs e)
         {
             //Start Visibility Delay
@@ -210,16 +205,18 @@ namespace PinballFrontEnd.View
                 return;
             }
 
-            //this.VlcControl.SourceProvider.MediaPlayer.Play(viewModel.CurrentTable.Playfield, mediaOptions);
+            //Check to see if playfield video exists before playing.
+            //This speeds up the interface vastly
+            if (viewModel.CurrentTable != null)
             if (viewModel.CurrentTable.Playfield != null && viewModel.CurrentTable.PlayfieldExists)
                 sourceProvider.MediaPlayer.Play(viewModel.CurrentTable.Playfield, mediaOptions);
-            //Console.WriteLine("RawR");
         }
 
         #endregion
 
         #region Global Error Handling
 
+        //Catch all program errors and log the exception.
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             //logger.ErrorException("Fatal Application Error",(System.Exception)e.ExceptionObject);

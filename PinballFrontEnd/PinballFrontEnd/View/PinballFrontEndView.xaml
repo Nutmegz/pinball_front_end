@@ -10,10 +10,10 @@
         Title="Pinball Front End"
         WindowStartupLocation="Manual"
         WindowStyle="None"
-        Width="{Binding MediaLocation.PlayfieldSizeX, Mode=TwoWay,NotifyOnTargetUpdated=True}"
-        Height="{Binding MediaLocation.PlayfieldSizeY, Mode=TwoWay,NotifyOnTargetUpdated=True}"
-        Left="{Binding MediaLocation.PlayfieldLocationX, Mode=TwoWay,NotifyOnTargetUpdated=True}"
-        Top="{Binding MediaLocation.PlayfieldLocationY, Mode=TwoWay,NotifyOnTargetUpdated=True}"
+        Width="{Binding Data.MediaLocation.PlayfieldSizeX, Mode=TwoWay,NotifyOnTargetUpdated=True}"
+        Height="{Binding Data.MediaLocation.PlayfieldSizeY, Mode=TwoWay,NotifyOnTargetUpdated=True}"
+        Left="{Binding Data.MediaLocation.PlayfieldLocationX, Mode=TwoWay,NotifyOnTargetUpdated=True}"
+        Top="{Binding Data.MediaLocation.PlayfieldLocationY, Mode=TwoWay,NotifyOnTargetUpdated=True}"
         Background="Black"
         ResizeMode="NoResize"
         x:Name="pfe"
@@ -29,66 +29,23 @@
 
 
     <Grid x:Name="MainGrid">
-        <!--<Vlc:VlcControl xmlns:Vlc="clr-namespace:Vlc.DotNet.Wpf;assembly=Vlc.DotNet.Wpf" x:Name="MyControl" />-->
-        
-        
-        <!--<ffme:MediaElement x:Name="Media" Background="Gray" LoadedBehavior="Play" UnloadedBehavior="Manual"  IsMuted="True" MediaOpened="MyMedia_MediaOpened" MediaEnded="Media_MediaEnded"/>-->
-        <!--<ffme:MediaElement x:Name="Media" Background="Gray" LoadedBehavior="Play" UnloadedBehavior="Manual"  Source="{Binding CurrentTable.Playfield}" IsMuted="True" MediaOpened="Media_MediaOpened_1" MediaOpening="Media_MediaOpening"   />-->
-        
-        <!--<Vlc:VlcControl xmlns:Vlc="clr-namespace:Vlc.DotNet.Wpf;assembly=Vlc.DotNet.Wpf" x:Name="MyControl" />-->
-        <!--<MediaElement Visibility="Hidden" x:Name="TestMe" LoadedBehavior="Manual"  TargetUpdated="TestMe_TargetUpdated" MediaOpened="TestMe_MediaOpened" />-->
-
-
-       
         <Canvas
             Width="{Binding ElementName=pfe, Path=Width}"
             Height="{Binding ElementName=pfe, Path=Height}">
             
-            
-            <!--<Vlc:VlcControl
-                x:Name="VlcControl"
-                Panel.ZIndex="0"
-                Width="{Binding ElementName=pfe, Path=Width}"
-                Height="{Binding ElementName=pfe, Path=Height}"
-               
-                />-->
-
+            <!-- Playfield Video-->
             <Image 
                 x:Name="Playfield"
                 Width="{Binding ElementName=pfe, Path=Width}"
                 Height="{Binding ElementName=pfe, Path=Height}"
                 Stretch="Fill" >
                 <Image.LayoutTransform>
-                    <RotateTransform Angle="{Binding MediaLocation.PlayfieldRotation}" />
+                    <RotateTransform Angle="{Binding Data.MediaLocation.PlayfieldRotation}" />
                 </Image.LayoutTransform>
             </Image>
 
 
-            <!--<MediaElement 
-                Visibility="Visible" 
-                x:Name="TestMe" 
-                LoadedBehavior="Manual"  
-                TargetUpdated="TestMe_TargetUpdated" 
-                MediaOpened="TestMe_MediaOpened"
-                Width="1920"
-                Height="1080"
-                Panel.ZIndex="0"/>-->
-
-            <!--<controls:MediaUriElement x:Name="TestMe"
-                                      
-                                  DeeperColor="False"
-                                      VideoRenderer="EnhancedVideoRenderer"
-                                      MediaFailed="TestMe_MediaFailed"
-                                  Visibility="Visible"
-                                  LoadedBehavior="Manual"
-                                  TargetUpdated="TestMe_TargetUpdated"
-                                  MediaOpened="TestMe_MediaOpened"
-                                  Panel.ZIndex="0"
-                                      Canvas.Left="0"
-                                      Width="1920"
-                                      Height="1080"
-                                  />-->
-
+            <!-- Playfield Preload Image-->
             <Image 
                 
                 x:Name="PreloadImage" 
@@ -102,16 +59,23 @@
                 Height="{Binding ElementName=pfe, Path=Height}">
 
                 <Image.LayoutTransform>
-                    <RotateTransform Angle="{Binding MediaLocation.PlayfieldRotation}" />
+                    <RotateTransform Angle="{Binding Data.MediaLocation.PlayfieldRotation}" />
                 </Image.LayoutTransform>
             </Image>
 
+            <!-- Table Wheel Image -->
             <Image 
                 Source="{Binding CurrentTable.WheelThumbnail,
                 NotifyOnSourceUpdated=True,
                 NotifyOnTargetUpdated=True}" 
-                Width="300" Height="300"
-                Panel.ZIndex="2"/>
+                Width="{Binding Data.MediaLocation.WheelSizeXY}" Height="{Binding Data.MediaLocation.WheelSizeXY}"
+                Canvas.Left="{Binding Data.MediaLocation.WheelLocationX}"
+                Canvas.Top="{Binding Data.MediaLocation.WheelLocationY}"
+                Panel.ZIndex="2">
+                <Image.LayoutTransform>
+                    <RotateTransform Angle="{Binding Data.MediaLocation.WheelRotation}" />
+                </Image.LayoutTransform>
+            </Image>
 
             
         </Canvas>

@@ -20,8 +20,8 @@ namespace PinballFrontEnd.Model
         public string Rom { get; set; } = "";
         public string Manufacturer { get; set; } = "";
         public string Year { get; set; } = "";
-        public bool HideDMD { get; set; } = true;
-        public bool HideBackglass { get; set; } = true;
+        public bool ShowDMD { get; set; } = false;
+        public bool ShowBackglass { get; set; } = false;
         public bool Enabled { get; set; } = true;
         public String System { get; set; } = "";
         public String Keywords { get; set; } = "";
@@ -165,18 +165,18 @@ namespace PinballFrontEnd.Model
         [JsonIgnore]
         public BitmapImage WheelThumbnail { get; set; } = new BitmapImage();
 
-        public void loadThumbnails()
+        public void loadThumbnails(int scale)
         {
             try
             {
 
-                if (PlayfieldImageExists) { PlayfieldThumbnail.BeginInit(); PlayfieldThumbnail.CacheOption = BitmapCacheOption.OnLoad; PlayfieldThumbnail.UriSource = PlayfieldImage; PlayfieldThumbnail.EndInit(); }
+                if (PlayfieldImageExists) { PlayfieldThumbnail.BeginInit(); PlayfieldThumbnail.DecodePixelWidth = scale; PlayfieldThumbnail.CacheOption = BitmapCacheOption.OnLoad; PlayfieldThumbnail.UriSource = PlayfieldImage; PlayfieldThumbnail.EndInit(); }
                 else { PlayfieldThumbnail.BeginInit(); PlayfieldThumbnail.CacheOption = BitmapCacheOption.OnLoad; PlayfieldThumbnail.UriSource = new Uri($@"{ProgramPath.Value}\Media\default.png"); PlayfieldThumbnail.EndInit(); }
 
-                if (BackglassImageExists) { BackglassThumbnail.BeginInit(); BackglassThumbnail.CacheOption = BitmapCacheOption.OnLoad; BackglassThumbnail.UriSource = BackglassImage; BackglassThumbnail.EndInit(); }
+                if (BackglassImageExists) { BackglassThumbnail.BeginInit(); BackglassThumbnail.DecodePixelWidth = scale; BackglassThumbnail.CacheOption = BitmapCacheOption.OnLoad; BackglassThumbnail.UriSource = BackglassImage; BackglassThumbnail.EndInit(); }
                 else { BackglassThumbnail.BeginInit(); BackglassThumbnail.CacheOption = BitmapCacheOption.OnLoad; BackglassThumbnail.UriSource = new Uri($@"{ProgramPath.Value}\Media\default.png"); BackglassThumbnail.EndInit(); }
 
-                if (DMDImageExists) { DMDThumbnail.BeginInit(); DMDThumbnail.CacheOption = BitmapCacheOption.OnLoad; DMDThumbnail.UriSource = DMDImage; DMDThumbnail.EndInit(); }
+                if (DMDImageExists) { DMDThumbnail.BeginInit(); DMDThumbnail.DecodePixelWidth = scale; DMDThumbnail.CacheOption = BitmapCacheOption.OnLoad; DMDThumbnail.UriSource = DMDImage; DMDThumbnail.EndInit(); }
                 else { DMDThumbnail.BeginInit(); DMDThumbnail.CacheOption = BitmapCacheOption.OnLoad; DMDThumbnail.UriSource = new Uri($@"{ProgramPath.Value}\Media\default.png"); DMDThumbnail.EndInit(); }
 
                 if (WheelExists) { WheelThumbnail.BeginInit(); WheelThumbnail.CacheOption = BitmapCacheOption.OnLoad; WheelThumbnail.UriSource = Wheel; WheelThumbnail.EndInit(); }
