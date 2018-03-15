@@ -1,6 +1,10 @@
 # Pinball Front End
 Pinball Front End is a high speed interface for pinball cabinets that allows launching of different digital pinball emulators / software.
 
+## PFE Table Manager
+
+![alt text](https://github.com/Nutmegz/pinball_front_end/blob/master/PinballFrontEnd/PinballFrontEnd/Images/PFE%20Table%20Manager.png "PFE Table Manager")
+
 ## Default Keybindings:
 | Function | Keybind |
 | :----------- | :----- |
