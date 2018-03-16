@@ -37,6 +37,8 @@ namespace PinballFrontEnd.Model
             else
                 libDirectory = new DirectoryInfo(System.IO.Path.Combine(currentDirectory, @"libvlc\x64\"));
 
+            libDirectory = new DirectoryInfo(Properties.Settings.Default.PATH_VLC);
+
             return libDirectory;
         }
 

@@ -22,5 +22,23 @@ namespace PinballFrontEnd.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Program Files\\VideoLAN\\VLC")]
+        public string PATH_VLC {
+            get {
+                return ((string)(this["PATH_VLC"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\ffmpeg")]
+        public string PATH_FFMPEG {
+            get {
+                return ((string)(this["PATH_FFMPEG"]));
+            }
+        }
     }
 }

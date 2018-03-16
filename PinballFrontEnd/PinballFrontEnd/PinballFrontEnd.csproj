@@ -196,6 +196,7 @@
     <Compile Include="View\TableManagerView.xaml.cs">
       <DependentUpon>TableManagerView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\VisToBool.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -211,7 +212,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="Images\splash.png" />
+    <SplashScreen Include="Images\splash.png" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -279,6 +280,6 @@
   <Import Project="..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets" Condition="Exists('..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets')" />
   <Import Project="..\packages\Fody.2.4.6\build\Fody.targets" Condition="Exists('..\packages\Fody.2.4.6\build\Fody.targets')" />
   <PropertyGroup>
-    <PostBuildEvent>XCOPY "$(SolutionDir)\libvlc" "$(TargetDir)\libvlc\" /Y/E</PostBuildEvent>
+    <PostBuildEvent>XCOPY "$(SolutionDir)PinballFrontEnd\Media" "$(TargetDir)Media\" /y /s /e</PostBuildEvent>
   </PropertyGroup>
 </Project>

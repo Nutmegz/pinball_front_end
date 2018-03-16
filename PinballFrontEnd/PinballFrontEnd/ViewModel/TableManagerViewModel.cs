@@ -51,6 +51,7 @@ namespace PinballFrontEnd.ViewModel
 
         // Commands
         public ICommand DummyWindowButton { get { return new RelayCommand(ShowHideDummyWindows); } }
+        public ICommand GenerateThumbnailsCommand { get { return new RelayCommand(GenerateThumbnails); } }
 
         private void InitalizeDummyWindows()
         {
@@ -88,6 +89,36 @@ namespace PinballFrontEnd.ViewModel
             BindWindow(DMDWindowDummy, Window.HeightProperty, this, "Data.MediaLocation.DMDSizeY", BindingMode.TwoWay);
 
 
+        }
+
+        //Convert Videos to thumbnails
+        private async void GenerateThumbnails(object obj)
+        {
+            Process proc = new Process();
+            proc.StartInfo.FileName = $@"{Properties.Settings.Default.PATH_FFMPEG}\bin\ffmpeg.exe";
+            proc.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+            foreach (PinballTable pt in Data.TableList)
+            {
+                if(pt.PlayfieldExists)
+                {
+                    proc.StartInfo.Arguments = $"-y -i \"{pt.Playfield.LocalPath}\" -vframes 1 -f image2 \"{pt.PlayfieldImage.LocalPath}\"";
+                    proc.Start();
+                    await Task.Run(() => proc.WaitForExit());
+                }
+                if(pt.BackglassExists)
+                {
+                    proc.StartInfo.Arguments = $"-y -i \"{pt.Backglass.LocalPath}\" -vframes 1 -f image2 \"{pt.BackglassImage.LocalPath}\"";
+                    proc.Start();
+                    await Task.Run(() => proc.WaitForExit());
+                }
+                if(pt.DMDExists)
+                {
+                    proc.StartInfo.Arguments = $"-y -i \"{pt.DMD.LocalPath}\" -vframes 1 -f image2 \"{pt.DMDImage.LocalPath}\"";
+                    proc.Start();
+                    await Task.Run(() => proc.WaitForExit());
+                }
+               
+            }
         }
 
         //Show Dummy Windows for location

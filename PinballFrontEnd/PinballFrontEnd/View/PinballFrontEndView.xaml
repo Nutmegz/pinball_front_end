@@ -1,84 +1,157 @@
-﻿<Window x:Class="PinballFrontEnd.View.PinballFrontEndView"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:PinballFrontEnd.View"
-        xmlns:Vlc="clr-namespace:Vlc.DotNet.Wpf;assembly=Vlc.DotNet.Wpf"
+﻿<Window
+    x:Class="PinballFrontEnd.View.PinballFrontEndView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:PinballFrontEnd.View"
+    xmlns:Vlc="clr-namespace:Vlc.DotNet.Wpf;assembly=Vlc.DotNet.Wpf"
+    mc:Ignorable="d"
+    Title="Pinball Front End"
+    WindowStartupLocation="Manual"
+    WindowStyle="None"
+    Width="{Binding Data.MediaLocation.PlayfieldSizeX, Mode=TwoWay,NotifyOnTargetUpdated=True}"
+    Height="{Binding Data.MediaLocation.PlayfieldSizeY, Mode=TwoWay,NotifyOnTargetUpdated=True}"
+    Left="{Binding Data.MediaLocation.PlayfieldLocationX, Mode=TwoWay,NotifyOnTargetUpdated=True}"
+    Top="{Binding Data.MediaLocation.PlayfieldLocationY, Mode=TwoWay,NotifyOnTargetUpdated=True}"
+    Background="Black"
+    ResizeMode="NoResize"
+    x:Name="pfe"
+    LostFocus="pfe_LostFocus"
+    Focusable="True"
+    AllowsTransparency="True"
+    Topmost="{Binding TopMost}"
+    Visibility="{Binding PlayfieldVisibility, Mode=TwoWay, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True}"
+    IsVisibleChanged="pfe_IsVisibleChanged">
 
-        mc:Ignorable="d"
-        Title="Pinball Front End"
-        WindowStartupLocation="Manual"
-        WindowStyle="None"
-        Width="{Binding Data.MediaLocation.PlayfieldSizeX, Mode=TwoWay,NotifyOnTargetUpdated=True}"
-        Height="{Binding Data.MediaLocation.PlayfieldSizeY, Mode=TwoWay,NotifyOnTargetUpdated=True}"
-        Left="{Binding Data.MediaLocation.PlayfieldLocationX, Mode=TwoWay,NotifyOnTargetUpdated=True}"
-        Top="{Binding Data.MediaLocation.PlayfieldLocationY, Mode=TwoWay,NotifyOnTargetUpdated=True}"
-        Background="Black"
-        ResizeMode="NoResize"
-        x:Name="pfe"
-        LostFocus="pfe_LostFocus"
-        Focusable="True"
-        AllowsTransparency="True"
-        Topmost="{Binding TopMost}"
-        Visibility="{Binding PlayfieldVisibility, Mode=TwoWay, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True}"
-        IsVisibleChanged="pfe_IsVisibleChanged"
+    <Window.Resources>
+
         
-        >
+        <local:VisToBool
+            x:Key="TrueIfVisible"
+            Inverted="False"
+           Not="False" />
+        
+        <local:VisToBool
+            x:Key="TrueIfNotVisible"
+            Inverted="False"
+            Not="True" />
+        
+        <local:VisToBool
+            x:Key="VisibleIfTrue"
+            Inverted="True"
+            Not="False" />
+        
+        <local:VisToBool
+            x:Key="VisibleIfNotTrue"
+            Inverted="True"
+            Not="True" />
+
+    </Window.Resources>
 
 
 
-    <Grid x:Name="MainGrid">
-        <Canvas
-            Width="{Binding ElementName=pfe, Path=Width}"
-            Height="{Binding ElementName=pfe, Path=Height}">
-            
-            <!-- Playfield Video-->
-            <Image 
-                x:Name="Playfield"
-                Width="{Binding ElementName=pfe, Path=Width}"
-                Height="{Binding ElementName=pfe, Path=Height}"
-                Stretch="Fill" >
-                <Image.LayoutTransform>
-                    <RotateTransform Angle="{Binding Data.MediaLocation.PlayfieldRotation}" />
-                </Image.LayoutTransform>
-            </Image>
+    <Grid
+        x:Name="MainGrid">
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition
+                Width="5*" />
+            <ColumnDefinition
+                Width="2*" />
+            <ColumnDefinition
+                Width="2*" />
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="2*" />
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="5*" />
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="2*" />
+        </Grid.RowDefinitions>
+
+        <!-- Playfield Video-->
+        <Image
+            x:Name="Playfield"
+            Grid.Column="0"
+            Grid.Row="0"
+            Grid.ColumnSpan="3"
+            Grid.RowSpan="5"
+            Stretch="Fill">
+            <Image.LayoutTransform>
+                <RotateTransform
+                    Angle="{Binding Data.MediaLocation.PlayfieldRotation}" />
+            </Image.LayoutTransform>
+        </Image>
 
 
-            <!-- Playfield Preload Image-->
-            <Image 
-                
-                x:Name="PreloadImage" 
-                Source="{Binding CurrentTable.PlayfieldThumbnail,
+        <!-- Playfield Preload Image-->
+        <Image
+            x:Name="PreloadImage"
+            Source="{Binding CurrentTable.PlayfieldThumbnail,
                 NotifyOnSourceUpdated=True,
-                NotifyOnTargetUpdated=True}" 
-                TargetUpdated="PreloadImage_SourceUpdated"
-                Panel.ZIndex="1"
-                Width="{Binding ElementName=pfe, Path=Width}"
-                Stretch="Fill"
-                Height="{Binding ElementName=pfe, Path=Height}">
+                NotifyOnTargetUpdated=True}"
+            TargetUpdated="PreloadImage_SourceUpdated"
+            Grid.Column="0"
+            Grid.Row="0"
+            Grid.ColumnSpan="3"
+            Grid.RowSpan="5"
+            Panel.ZIndex="1"
+            Stretch="Fill">
 
-                <Image.LayoutTransform>
-                    <RotateTransform Angle="{Binding Data.MediaLocation.PlayfieldRotation}" />
-                </Image.LayoutTransform>
-            </Image>
+            <Image.LayoutTransform>
+                <RotateTransform
+                    Angle="{Binding Data.MediaLocation.PlayfieldRotation}" />
+            </Image.LayoutTransform>
+        </Image>
 
-            <!-- Table Wheel Image -->
-            <Image 
-                Source="{Binding CurrentTable.WheelThumbnail,
+        <!-- Table Wheel Image -->
+        <Image
+            Source="{Binding CurrentTable.WheelThumbnail,
                 NotifyOnSourceUpdated=True,
-                NotifyOnTargetUpdated=True}" 
-                Width="{Binding Data.MediaLocation.WheelSizeXY}" Height="{Binding Data.MediaLocation.WheelSizeXY}"
-                Canvas.Left="{Binding Data.MediaLocation.WheelLocationX}"
-                Canvas.Top="{Binding Data.MediaLocation.WheelLocationY}"
-                Panel.ZIndex="2">
-                <Image.LayoutTransform>
-                    <RotateTransform Angle="{Binding Data.MediaLocation.WheelRotation}" />
-                </Image.LayoutTransform>
-            </Image>
+                NotifyOnTargetUpdated=True}"
+            Grid.Column="1"
+            Grid.Row="2"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Stretch="Uniform"
+            Panel.ZIndex="2">
+            <Image.LayoutTransform>
+                <RotateTransform
+                    Angle="{Binding Data.MediaLocation.WheelRotation}" />
+            </Image.LayoutTransform>
+        </Image>
 
-            
-        </Canvas>
+        <!-- Table Name -->
+        <Viewbox
+            Grid.Column="1"
+            Grid.Row="2"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Stretch="Uniform"
+            StretchDirection="DownOnly"
+            Panel.ZIndex="3">
+            <TextBlock
+                FontWeight="ExtraBold"
+                FontSize="100"
+                Foreground="White"
+                Text="{Binding CurrentTable.Description}"
+                Visibility="{Binding CurrentTable.WheelExists, Converter={StaticResource VisibleIfNotTrue}}">
+                <TextBlock.LayoutTransform>
+                    <RotateTransform
+                        Angle="{Binding Data.MediaLocation.WheelRotation}" />
+                </TextBlock.LayoutTransform>
+            </TextBlock>
+        </Viewbox>
+
+
+
     </Grid>
 </Window>
     

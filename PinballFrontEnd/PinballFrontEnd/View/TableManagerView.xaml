@@ -14,8 +14,7 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     Closing="Window_Closing"
     Topmost="{Binding TopMost, Mode=TwoWay, NotifyOnSourceUpdated=True,NotifyOnTargetUpdated=True}"
-    WindowStartupLocation="CenterScreen"
-    GlowBrush="{DynamicResource AccentColorBrush}">
+    WindowStartupLocation="CenterScreen">
 
 
 
@@ -151,6 +150,10 @@
         <StackPanel
             Grid.Row="0"
             Grid.Column="0">
+
+            <Button
+                Content="Generate Thumbnails"
+                Command="{Binding GenerateThumbnailsCommand}"/>
 
             <!--<Button 
                 Grid.Row="0" 

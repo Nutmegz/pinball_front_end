@@ -40,9 +40,6 @@ namespace PinballFrontEnd.View
 
         #region PFE
 
-        //Array of Strings to hold VLC player options
-        private string[] mediaOptions;
-
         //VLC Source provider (Video Player)
         private VlcVideoSourceProvider sourceProvider;
 
@@ -54,30 +51,14 @@ namespace PinballFrontEnd.View
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             // SETUP VLC LIBRARY
             ///////////////////////////////////////////////////////////////////////////////////////////////////
-            var currentAssembly = System.Reflection.Assembly.GetEntryAssembly();
-            var currentDirectory = new FileInfo(currentAssembly.Location).DirectoryName;
-            DirectoryInfo libDirectory;
-
-            // Default libraries are stored here, but they are old, don't use them.
-            // We need a better way to install them, see https://github.com/ZeBobo5/Vlc.DotNet/issues/288
-            if (IntPtr.Size == 4)
-                libDirectory = new DirectoryInfo(Path.Combine(currentDirectory, @"libvlc\x86\"));
-            else
-                libDirectory = new DirectoryInfo(Path.Combine(currentDirectory, @"libvlc\x64\"));
 
             //Create Video Source Provider
             sourceProvider = new VlcVideoSourceProvider(this.Dispatcher);
-            sourceProvider.CreatePlayer(libDirectory);
+            sourceProvider.CreatePlayer(Model.VlcGlobal.GetVlcLibrary());
             sourceProvider.MediaPlayer.Playing += MediaPlayer_Playing;
 
             //Bind source provider to image
             Playfield.SetBinding(Image.SourceProperty, new Binding(nameof(VlcVideoSourceProvider.VideoSource)) { Source = sourceProvider });
-
-            mediaOptions = new string[]
-            {
-                ":input-repeat=2147483647",
-                ":no-audio"
-            };
 
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             // SETUP View Model
@@ -107,9 +88,6 @@ namespace PinballFrontEnd.View
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             //Setup Error Logger
             //AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-
-            //Setup FFME
-            //Unosquare.FFME.MediaElement.FFmpegDirectory = $@"C:\ffmpeg\bin";
 
             //Set to software render
             //RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
@@ -186,7 +164,14 @@ namespace PinballFrontEnd.View
             if (!CheckAccess())
             {
                 //If not on UI thread move to UI thread.
-                Dispatcher.Invoke(() => ShowTimer_Elapsed(sender, e));
+                try
+                {
+                    Dispatcher.Invoke(() => ShowTimer_Elapsed(sender, e));
+                }
+                catch (Exception)
+                {
+                }
+               
                 return;
             }
             //Console.WriteLine("Visibility Timer Tick");
@@ -201,7 +186,14 @@ namespace PinballFrontEnd.View
             if (!CheckAccess())
             {
                 //If not on UI thread move to UI thread.
-                Dispatcher.Invoke(() => VidTimer_Elapsed(sender, e));
+                try
+                {
+                    Dispatcher.Invoke(() => VidTimer_Elapsed(sender, e));
+                }
+                catch (Exception)
+                {
+                }
+                
                 return;
             }
 
@@ -209,7 +201,7 @@ namespace PinballFrontEnd.View
             //This speeds up the interface vastly
             if (viewModel.CurrentTable != null)
             if (viewModel.CurrentTable.Playfield != null && viewModel.CurrentTable.PlayfieldExists)
-                sourceProvider.MediaPlayer.Play(viewModel.CurrentTable.Playfield, mediaOptions);
+                sourceProvider.MediaPlayer.Play(viewModel.CurrentTable.Playfield, Model.VlcGlobal.GetVlcArguments());
         }
 
         #endregion

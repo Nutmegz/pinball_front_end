@@ -115,7 +115,16 @@ namespace PinballFrontEnd.View
             if (!CheckAccess())
             {
                 //If not on UI thread move to UI thread.
-                Dispatcher.Invoke(() => VidTimer_Elapsed(sender, e));
+                try
+                {
+                    Dispatcher.Invoke(() => VidTimer_Elapsed(sender, e));
+                }
+                catch (Exception)
+                {
+
+                    //throw;
+                }
+               
                 return;
             }
 

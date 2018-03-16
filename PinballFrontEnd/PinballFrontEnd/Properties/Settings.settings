@@ -1,5 +1,12 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="PinballFrontEnd.Properties" GeneratedClassName="Settings">
   <Profiles />
-  <Settings />
+  <Settings>
+    <Setting Name="PATH_VLC" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">C:\Program Files\VideoLAN\VLC</Value>
+    </Setting>
+    <Setting Name="PATH_FFMPEG" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">C:\ffmpeg</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>
