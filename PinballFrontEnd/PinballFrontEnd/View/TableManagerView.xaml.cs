@@ -19,6 +19,8 @@ using System.Collections.ObjectModel;
 using Vlc.DotNet.Wpf;
 using MahApps.Metro.Controls;
 
+//TODO: Conform with MVVM and move most code into the view model.
+
 namespace PinballFrontEnd.View
 {
     /// <summary>
@@ -45,7 +47,8 @@ namespace PinballFrontEnd.View
             this.databasepath = databasepath;
             viewModel = new PinballFrontEnd.ViewModel.TableManagerViewModel(this.databasepath);
             this.DataContext = viewModel;
-            SetupVlcSourceProvider();
+            //SubscribeToViewModelEvents();
+            //SetupVlcSourceProvider();
         }
 
         public TableManagerView(PinballData data)
@@ -54,7 +57,19 @@ namespace PinballFrontEnd.View
 
             viewModel = new PinballFrontEnd.ViewModel.TableManagerViewModel(data);
             this.DataContext = viewModel;
-            SetupVlcSourceProvider();
+            //SubscribeToViewModelEvents();
+            //SetupVlcSourceProvider();
+        }
+
+        
+
+        private void SubscribeToViewModelEvents()
+        {
+            if(viewModel != null)
+            {
+                viewModel.MediaImportStarted += ViewModel_MediaImportStarted;
+                viewModel.MediaImportFinished += ViewModel_MediaImportFinished;
+            }
         }
 
         private void SetupVlcSourceProvider()
@@ -64,48 +79,22 @@ namespace PinballFrontEnd.View
             playfieldSourceProvider.CreatePlayer(Model.VlcGlobal.GetVlcLibrary());
 
             //Bind source provider to image
-            PlayfieldMedia.SetBinding(Image.SourceProperty, new System.Windows.Data.Binding(nameof(VlcVideoSourceProvider.VideoSource)) { Source = playfieldSourceProvider });
+            //PlayfieldMedia.SetBinding(Image.SourceProperty, new System.Windows.Data.Binding(nameof(VlcVideoSourceProvider.VideoSource)) { Source = playfieldSourceProvider });
 
             //Create Video Source Provider
             backglassSourceProvider = new VlcVideoSourceProvider(this.Dispatcher);
             backglassSourceProvider.CreatePlayer(Model.VlcGlobal.GetVlcLibrary());
 
             //Bind source provider to image
-            BackglassMedia.SetBinding(Image.SourceProperty, new System.Windows.Data.Binding(nameof(VlcVideoSourceProvider.VideoSource)) { Source = backglassSourceProvider });
+            //BackglassMedia.SetBinding(Image.SourceProperty, new System.Windows.Data.Binding(nameof(VlcVideoSourceProvider.VideoSource)) { Source = backglassSourceProvider });
 
             //Create Video Source Provider
             dmdSourceProvider = new VlcVideoSourceProvider(this.Dispatcher);
             dmdSourceProvider.CreatePlayer(Model.VlcGlobal.GetVlcLibrary());
 
             //Bind source provider to image
-            DMDMedia.SetBinding(Image.SourceProperty, new System.Windows.Data.Binding(nameof(VlcVideoSourceProvider.VideoSource)) { Source = dmdSourceProvider });
+            //DMDMedia.SetBinding(Image.SourceProperty, new System.Windows.Data.Binding(nameof(VlcVideoSourceProvider.VideoSource)) { Source = dmdSourceProvider });
         }
-
-        ////Easy Video Repeat Function
-        //private void PlayfieldMediaRepeat(object sender, RoutedEventArgs e)
-        //{
-        //    logger.Trace("Repeating Playfield Media");
-        //    PlayfieldMedia.Position = TimeSpan.Zero;
-        //    PlayfieldMedia.Play();
-        //}
-        //private void BackglassMediaRepeat(object sender, RoutedEventArgs e)
-        //{
-        //    logger.Trace("Repeating Backglass Media");
-        //    BackglassMedia.Position = TimeSpan.Zero;
-        //    BackglassMedia.Play();
-        //}
-        //private void DMDMediaRepeat(object sender, RoutedEventArgs e)
-        //{
-        //    logger.Trace("Repeating DMD Media");
-        //    DMDMedia.Position = TimeSpan.Zero;
-        //    DMDMedia.Play();
-        //}
-        //private void WheelMediaRepeat(object sender, RoutedEventArgs e)
-        //{
-        //    logger.Trace("Repeating Wheel Media");
-        //    WheelMedia.Position = TimeSpan.Zero;
-        //    WheelMedia.Play();
-        //}
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -121,16 +110,76 @@ namespace PinballFrontEnd.View
             if (dg.SelectedItem != null && dg.SelectedItem.ToString() != "{NewItemPlaceholder}")
             {
                 var si = (PinballTable)dg.SelectedItem;
+
+
+
+
                 StartMedia(playfieldSourceProvider, si.Playfield);
                 StartMedia(backglassSourceProvider, si.Backglass);
                 StartMedia(dmdSourceProvider, si.DMD);
+
+                /*
+                if (si.PlayfieldExists)
+                    PlayfieldMedia.Visibility = Visibility.Visible;
+                else
+                    PlayfieldMedia.Visibility = Visibility.Hidden;
+                if (si.BackglassExists)
+                    BackglassMedia.Visibility = Visibility.Visible;
+                else
+                    BackglassMedia.Visibility = Visibility.Hidden;
+                if (si.DMDExists)
+                    DMDMedia.Visibility = Visibility.Visible;
+                else
+                    DMDMedia.Visibility = Visibility.Hidden;
+                    */
             }
-           
+
         }
+
+        private void ViewModel_MediaImportFinished(object sender, PinballTable table)
+        {
+            //Check if on UI thread
+            if (!CheckAccess())
+            {
+                //If not on UI thread move to UI thread.
+                Dispatcher.Invoke(() => ViewModel_MediaImportStarted(sender, table));
+                return;
+            }
+            //TableSelect.SelectedIndex = TableSelect.SelectedIndex;
+            //TableSelect.SelectedIndex = tableSelectedIndex;
+            StartMedia(playfieldSourceProvider, viewModel.SelectedTable.Playfield);
+            StartMedia(backglassSourceProvider, viewModel.SelectedTable.Backglass);
+            StartMedia(dmdSourceProvider, viewModel.SelectedTable.DMD);
+            
+        }
+
+        private void ViewModel_MediaImportStarted(object sender, PinballTable table)
+        {
+            //Check if on UI thread
+            if (!CheckAccess())
+            {
+                //If not on UI thread move to UI thread.
+                Dispatcher.Invoke(() => ViewModel_MediaImportStarted(sender, table));
+                return;
+            }
+            
+            StopMedia(playfieldSourceProvider);
+            StopMedia(backglassSourceProvider);
+            StopMedia(dmdSourceProvider);
+            //TableSelect.SelectedIndex = TableSelect.Items.Count;
+        }
+
         private void StartMedia(VlcVideoSourceProvider sp, Uri media)
         {
-            if(media != null && File.Exists(media.LocalPath) && sp != null)
+            if (media != null && File.Exists(media.LocalPath) && sp != null)
                 sp.MediaPlayer.Play(media, Model.VlcGlobal.GetVlcArguments());
+        }
+
+        private void StopMedia(VlcVideoSourceProvider sp)
+        {
+            //sp.MediaPlayer.Stop();
+            sp.MediaPlayer.Play(new Uri("C:\\"),VlcGlobal.GetVlcArguments());
+
         }
     }
 }

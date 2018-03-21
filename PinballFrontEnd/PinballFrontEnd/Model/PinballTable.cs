@@ -147,6 +147,7 @@ namespace PinballFrontEnd.Model
                 return Exists(BGMusic.LocalPath);
             }
         }
+       
         [JsonIgnore]
         public bool LMusicExists
         {
@@ -154,6 +155,7 @@ namespace PinballFrontEnd.Model
             {
                 return Exists(LMusic.LocalPath);
             }
+
         }
 
         [JsonIgnore]
@@ -165,7 +167,12 @@ namespace PinballFrontEnd.Model
         [JsonIgnore]
         public BitmapImage WheelThumbnail { get; set; } = new BitmapImage();
 
-        public void loadThumbnails(int scale)
+        public void RunAudit()
+        {
+            NotifyPropertyChanged(null);
+        }
+
+        public void LoadThumbnails(int scale)
         {
             try
             {

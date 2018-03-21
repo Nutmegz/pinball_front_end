@@ -6,15 +6,34 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
     xmlns:local="clr-namespace:PinballFrontEnd.View"
+    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
     mc:Ignorable="d"
-    Title="Pinball Front End - Settings"
-    Height="1080"
-    Width="1920"
+    Title="PFE Table Manager"
+    Width="1600"
+    Height="900"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     Closing="Window_Closing"
     Topmost="{Binding TopMost, Mode=TwoWay, NotifyOnSourceUpdated=True,NotifyOnTargetUpdated=True}"
     WindowStartupLocation="CenterScreen">
+
+
+    <Controls:MetroWindow.RightWindowCommands>
+        <Controls:WindowCommands>
+            <ToggleButton
+                x:Name="BtnImport"
+                Content="Import"
+                IsChecked="{Binding ElementName=ImportFlyout, Path=IsOpen}"
+                Cursor="Hand"
+                FontSize="20" />
+
+            <Button
+                Content="Generate Thumbnails"
+                Command="{Binding GenerateThumbnailsCommand}" />
+
+        </Controls:WindowCommands>
+    </Controls:MetroWindow.RightWindowCommands>
 
 
 
@@ -22,9 +41,45 @@
         <Controls:FlyoutsControl>
 
             <Controls:Flyout
-                Header="Flyout"
-                Position="Bottom"
-                Width="200">
+                x:Name="ImportFlyout"
+                Header="Import"
+                Position="Right"
+                Width="400"
+                Theme="Accent">
+                <StackPanel>
+                    <Button
+                        Content="Playfield Video"
+                        Command="{Binding GetPlayfieldCommand}" />
+                    <Button
+                        Content="Backglass Video"
+                        Command="{Binding GetBackglassCommand}" />
+                    <Button
+                        Content="DMD Video"
+                        Command="{Binding GetDMDCommand}" />
+                    <Button
+                        Content="Wheel Image"
+                        Command="{Binding GetWheelCommand}" />
+                    <Button
+                        Content="Table Audio"
+                        Command="{Binding GetTableAudioCommand}" />
+                    <Button
+                        Content="Launch Audio"
+                        Command="{Binding GetLaunchAudioCommand}" />
+                    <StackPanel
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Left">
+                        <TextBlock
+                            Text="Convert: " />
+                        <Controls:ToggleSwitch
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            HorizontalAlignment="Center"
+                            IsChecked="{Binding Data.MediaLocation.ConvertOnImport, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+
+
+                </StackPanel>
+
                 <!-- Your custom content here -->
             </Controls:Flyout>
 
@@ -34,17 +89,64 @@
 
     <Window.Resources>
 
+        <SolidColorBrush
+            x:Key="FileExists"
+            Color="lightGreen" />
+
+
+
+        <local:UriToCachedImageConverter
+            x:Key="uriToImageConv" />
+
+        <local:ExpandedConverter
+            x:Key="ExpandedConverter" />
+
 
         <Thickness
             x:Key="CommonMargin"
-            Left="6"
-            Right="6"
-            Top="6"
-            Bottom="6" />
+            Left="2"
+            Right="2"
+            Top="2"
+            Bottom="2" />
         <sys:Double
-            x:Key="BaseFontSize">18</sys:Double>
+            x:Key="BaseFontSize">14</sys:Double>
+        <sys:Double
+            x:Key="Title1">18</sys:Double>
+        <sys:Double
+            x:Key="Title2">16</sys:Double>
 
 
+
+        <Style
+            x:Key="IconButton"
+            TargetType="Button"
+            BasedOn="{StaticResource {x:Type Button}}">
+
+
+        </Style>
+
+        <Style
+            x:Key="TableHeader"
+            TargetType="TextBlock"
+            BasedOn="{StaticResource {x:Type TextBlock}}">
+            <Setter
+                Property="FontSize"
+                Value="{StaticResource Title2}" />
+            <Setter
+                Property="FontWeight"
+                Value="Bold" />
+        </Style>
+
+        <Style
+            TargetType="ToggleButton"
+            BasedOn="{StaticResource {x:Type ToggleButton}}">
+            <Setter
+                Property="FontSize"
+                Value="{StaticResource BaseFontSize}" />
+            <Setter
+                Property="Margin"
+                Value="{StaticResource CommonMargin}" />
+        </Style>
 
         <Style
             TargetType="Button"
@@ -73,7 +175,10 @@
             BasedOn="{StaticResource {x:Type Expander}}">
             <Setter
                 Property="FontSize"
-                Value="{StaticResource BaseFontSize}" />
+                Value="{StaticResource Title1}" />
+            <Setter
+                Property="FontWeight"
+                Value="Bold" />
             <Setter
                 Property="Margin"
                 Value="{StaticResource CommonMargin}" />
@@ -122,451 +227,332 @@
 
 
 
-    <Grid>
 
-
-
-        <Grid.RowDefinitions>
-            <RowDefinition
-                Height="Auto" />
-            <RowDefinition
-                Height="*" />
-        </Grid.RowDefinitions>
-
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition
-                MaxWidth="600" />
-            <ColumnDefinition
-                Width="2*" />
-            <ColumnDefinition
-                Width="3*" />
-        </Grid.ColumnDefinitions>
+    <DockPanel>
 
 
 
 
-
-
-        <StackPanel
-            Grid.Row="0"
-            Grid.Column="0">
-
-            <Button
-                Content="Generate Thumbnails"
-                Command="{Binding GenerateThumbnailsCommand}"/>
-
-            <!--<Button 
-                Grid.Row="0" 
-                Grid.Column="0" 
-                Grid.ColumnSpan="10"  
-                Command="{Binding SaveTableList}" 
-                Content="Save Table Database" 
-                Style="{DynamicResource MaterialDesignRaisedDarkButton}"
-                Margin="{StaticResource CommonMargin}"/>
-            <Button 
-                Grid.Row="1" 
-                Grid.Column="0" 
-                Grid.ColumnSpan="10" 
-                Command="{Binding OpenTableList}" 
-                Content="Open Table Database"
-                Style="{DynamicResource MaterialDesignRaisedDarkButton}"
-                Margin="{StaticResource CommonMargin}"/>-->
-
-        </StackPanel>
-
-        <DockPanel
-            Grid.Row="1"
+        <!-- FrontEnd Settings -->
+        <Expander
+            DockPanel.Dock="Top"
             Grid.Column="0"
-            ScrollViewer.CanContentScroll="True"
-            ScrollViewer.VerticalScrollBarVisibility="Auto">
-
-
-            <TextBlock
-                Text="System Select"
-                HorizontalAlignment="Center"
-                DockPanel.Dock="Top"
-                FontWeight="Bold"
-                FontSize="20" />
-
-
-            <DataGrid
-                x:Name="SystemSelect"
-                ItemsSource="{Binding Data.SystemList}"
-                DisplayMemberPath="Name"
-                AutoGenerateColumns="False"
-                SelectedValue="{Binding SelectedSystem, Mode=TwoWay}"
-                DockPanel.Dock="Top">
-
-                <DataGrid.Columns>
-                    <DataGridTextColumn
-                        Header="System"
-                        Binding="{Binding Name}"
-                        Width="*" />
-                </DataGrid.Columns>
-
-            </DataGrid>
-
-
-            <TextBlock
-                Text="Table Select"
-                HorizontalAlignment="Center"
-                DockPanel.Dock="Top"
-                FontWeight="Bold"
-                FontSize="20" />
-            <DataGrid
-                x:Name="TableSelect"
-                ItemsSource="{Binding Data.TableList}"
-                DisplayMemberPath="Name"
-                SelectionMode="Single"
-                AutoGenerateColumns="False"
-                SelectedValue="{Binding SelectedTable, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                ScrollViewer.CanContentScroll="True"
-                ScrollViewer.VerticalScrollBarVisibility="Auto"
-                ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                DockPanel.Dock="Top"
-                SelectionChanged="TableSelect_SelectionChanged">
-
-
-                <DataGrid.Columns>
-                    <!--<DataGridCheckBoxColumn 
-                        Header="Enabled"
-                        Binding="{Binding Enabled}"/>-->
-                    <DataGridTextColumn
-                        Header="Table"
-                        Binding="{Binding Description}"
-                        Width="*" />
-                </DataGrid.Columns>
-
-            </DataGrid>
-
-
-        </DockPanel>
-
-        <ScrollViewer
-            Grid.Column="1"
             Grid.Row="0"
-            Grid.RowSpan="2">
+            HorizontalAlignment="Stretch"
+            IsExpanded="{Binding CurrentExpanded, Converter={StaticResource ExpandedConverter}, ConverterParameter=1}">
+            <Expander.Header>
+
+                <TextBlock
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Grid.ColumnSpan="3"
+                    Text="Front End Settings"
+                    HorizontalAlignment="Left" />
 
 
-            <StackPanel>
-
-
-
-
-                <!-- FrontEnd Settings -->
-                <Expander
-                    HorizontalAlignment="Stretch">
-                    <Expander.Header>
-
-                        <TextBlock
-                            Grid.Row="0"
-                            Grid.Column="1"
-                            Grid.ColumnSpan="3"
-                            Text="Front End Settings"
-                            HorizontalAlignment="Right"
-                            FontWeight="ExtraBold"
-                            FontSize="20" />
-
-
-                    </Expander.Header>
+            </Expander.Header>
 
 
 
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition
-                                Width="*" />
-                            <ColumnDefinition
-                                Width="*" />
-                            <ColumnDefinition
-                                Width="*" />
-                            <ColumnDefinition
-                                Width="*" />
-                        </Grid.ColumnDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="*" />
+                    <ColumnDefinition
+                        Width="*" />
+                    <ColumnDefinition
+                        Width="*" />
+                    <ColumnDefinition
+                        Width="*" />
+                </Grid.ColumnDefinitions>
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-
-
-                        <TextBlock
-                            Grid.Row="1"
-                            Grid.Column="1"
-                            Text="Playfield"
-                            HorizontalAlignment="Center"
-                            FontWeight="Bold"
-                            FontSize="20" />
-
-                        <TextBlock
-                            Grid.Row="1"
-                            Grid.Column="2"
-                            Text="Backglass"
-                            HorizontalAlignment="Center"
-                            FontWeight="Bold"
-                            FontSize="20" />
-
-                        <TextBlock
-                            Grid.Row="1"
-                            Grid.Column="3"
-                            Text="DMD"
-                            HorizontalAlignment="Center"
-                            FontWeight="Bold"
-                            FontSize="20" />
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
 
 
-                        <TextBlock
-                            Grid.Row="2"
-                            Grid.Column="0"
-                            Text="X Location:"
-                            HorizontalAlignment="Right" />
+                <TextBlock
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Text="Playfield"
+                    HorizontalAlignment="Center"
+                    Style="{StaticResource TableHeader}" />
 
-                        <TextBlock
-                            Grid.Row="3"
-                            Grid.Column="0"
-                            Text="Y Location:"
-                            HorizontalAlignment="Right" />
+                <TextBlock
+                    Grid.Row="1"
+                    Grid.Column="2"
+                    Text="Backglass"
+                    HorizontalAlignment="Center"
+                    Style="{StaticResource TableHeader}" />
 
-                        <TextBlock
-                            Grid.Row="4"
-                            Grid.Column="0"
-                            Text="Width:"
-                            HorizontalAlignment="Right" />
-
-                        <TextBlock
-                            Grid.Row="5"
-                            Grid.Column="0"
-                            Text="Height:"
-                            HorizontalAlignment="Right" />
-
-                        <TextBlock
-                            Grid.Row="6"
-                            Grid.Column="0"
-                            Text="Rotation:"
-                            HorizontalAlignment="Right" />
-
-                        <!-- Playfield X Location -->
-                        <TextBox
-                            Grid.Row="2"
-                            Grid.Column="1"
-                            HorizontalAlignment="Stretch"
-                            TextAlignment="Center"
-                            Margin="{StaticResource CommonMargin}"
-                            Text="{Binding Data.MediaLocation.PlayfieldLocationX, UpdateSourceTrigger=PropertyChanged}" />
-
-                        <!-- Playfield Y Location -->
-                        <TextBox
-                            Grid.Row="3"
-                            Grid.Column="1"
-                            HorizontalAlignment="Stretch"
-                            TextAlignment="Center"
-                            Margin="{StaticResource CommonMargin}"
-                            Text="{Binding Data.MediaLocation.PlayfieldLocationY, UpdateSourceTrigger=PropertyChanged}" />
-
-                        <!-- Playfield Width -->
-                        <TextBox
-                            Grid.Row="4"
-                            Grid.Column="1"
-                            HorizontalAlignment="Stretch"
-                            TextAlignment="Center"
-                            Margin="{StaticResource CommonMargin}"
-                            Text="{Binding Data.MediaLocation.PlayfieldSizeX, UpdateSourceTrigger=PropertyChanged}" />
-
-                        <!-- Playfield Height -->
-                        <TextBox
-                            Grid.Row="5"
-                            Grid.Column="1"
-                            HorizontalAlignment="Stretch"
-                            TextAlignment="Center"
-                            Margin="{StaticResource CommonMargin}"
-                            Text="{Binding Data.MediaLocation.PlayfieldSizeY, UpdateSourceTrigger=PropertyChanged}" />
-
-                        <!-- Playfield Rotation -->
-                        <TextBox
-                            Grid.Row="6"
-                            Grid.Column="1"
-                            HorizontalAlignment="Stretch"
-                            TextAlignment="Center"
-                            Margin="{StaticResource CommonMargin}"
-                            Text="{Binding Data.MediaLocation.PlayfieldRotation, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock
+                    Grid.Row="1"
+                    Grid.Column="3"
+                    Text="DMD"
+                    HorizontalAlignment="Center"
+                    Style="{StaticResource TableHeader}" />
 
 
-                        <!-- Backglass X Location -->
-                        <TextBox
-                            Grid.Row="2"
-                            Grid.Column="2"
-                            HorizontalAlignment="Stretch"
-                            TextAlignment="Center"
-                            Margin="{StaticResource CommonMargin}"
-                            Text="{Binding Data.MediaLocation.BackglassLocationX, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Text="X Location:"
+                    HorizontalAlignment="Right"
+                    Style="{StaticResource TableHeader}" />
 
-                        <!-- Backglass Y Location -->
-                        <TextBox
-                            Grid.Row="3"
-                            Grid.Column="2"
-                            HorizontalAlignment="Stretch"
-                            TextAlignment="Center"
-                            Margin="{StaticResource CommonMargin}"
-                            Text="{Binding Data.MediaLocation.BackglassLocationY, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock
+                    Grid.Row="3"
+                    Grid.Column="0"
+                    Text="Y Location:"
+                    HorizontalAlignment="Right"
+                    Style="{StaticResource TableHeader}" />
 
-                        <!-- Backglass Width -->
-                        <TextBox
-                            Grid.Row="4"
-                            Grid.Column="2"
-                            HorizontalAlignment="Stretch"
-                            TextAlignment="Center"
-                            Margin="{StaticResource CommonMargin}"
-                            Text="{Binding Data.MediaLocation.BackglassSizeX, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock
+                    Grid.Row="4"
+                    Grid.Column="0"
+                    Text="Width:"
+                    HorizontalAlignment="Right"
+                    Style="{StaticResource TableHeader}" />
 
-                        <!-- Backglass Height -->
-                        <TextBox
-                            Grid.Row="5"
-                            Grid.Column="2"
-                            HorizontalAlignment="Stretch"
-                            TextAlignment="Center"
-                            Margin="{StaticResource CommonMargin}"
-                            Text="{Binding Data.MediaLocation.BackglassSizeY, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock
+                    Grid.Row="5"
+                    Grid.Column="0"
+                    Text="Height:"
+                    HorizontalAlignment="Right"
+                    Style="{StaticResource TableHeader}" />
 
-                        <!-- Backglass Rotation -->
-                        <TextBox
-                            Grid.Row="6"
-                            Grid.Column="2"
-                            HorizontalAlignment="Stretch"
-                            TextAlignment="Center"
-                            Margin="{StaticResource CommonMargin}"
-                            Text="{Binding Data.MediaLocation.BackglassRotation, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock
+                    Grid.Row="6"
+                    Grid.Column="0"
+                    Text="Rotation:"
+                    HorizontalAlignment="Right"
+                    Style="{StaticResource TableHeader}" />
 
+                <!-- Playfield X Location -->
+                <TextBox
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding Data.MediaLocation.PlayfieldLocationX, UpdateSourceTrigger=PropertyChanged}" />
 
-                        <!-- DMD X Location -->
-                        <TextBox
-                            Grid.Row="2"
-                            Grid.Column="3"
-                            HorizontalAlignment="Stretch"
-                            TextAlignment="Center"
-                            Margin="{StaticResource CommonMargin}"
-                            Text="{Binding Data.MediaLocation.DMDLocationX, UpdateSourceTrigger=PropertyChanged}" />
+                <!-- Playfield Y Location -->
+                <TextBox
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding Data.MediaLocation.PlayfieldLocationY, UpdateSourceTrigger=PropertyChanged}" />
 
-                        <!-- DMD Y Location -->
-                        <TextBox
-                            Grid.Row="3"
-                            Grid.Column="3"
-                            HorizontalAlignment="Stretch"
-                            TextAlignment="Center"
-                            Margin="{StaticResource CommonMargin}"
-                            Text="{Binding Data.MediaLocation.DMDLocationY, UpdateSourceTrigger=PropertyChanged}" />
+                <!-- Playfield Width -->
+                <TextBox
+                    Grid.Row="4"
+                    Grid.Column="1"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding Data.MediaLocation.PlayfieldSizeX, UpdateSourceTrigger=PropertyChanged}" />
 
-                        <!-- DMD Width -->
-                        <TextBox
-                            Grid.Row="4"
-                            Grid.Column="3"
-                            HorizontalAlignment="Stretch"
-                            TextAlignment="Center"
-                            Margin="{StaticResource CommonMargin}"
-                            Text="{Binding Data.MediaLocation.DMDSizeX, UpdateSourceTrigger=PropertyChanged}" />
+                <!-- Playfield Height -->
+                <TextBox
+                    Grid.Row="5"
+                    Grid.Column="1"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding Data.MediaLocation.PlayfieldSizeY, UpdateSourceTrigger=PropertyChanged}" />
 
-                        <!-- DMD Height -->
-                        <TextBox
-                            Grid.Row="5"
-                            Grid.Column="3"
-                            HorizontalAlignment="Stretch"
-                            TextAlignment="Center"
-                            Margin="{StaticResource CommonMargin}"
-                            Text="{Binding Data.MediaLocation.DMDSizeY, UpdateSourceTrigger=PropertyChanged}" />
-
-                        <!-- DMD Rotation -->
-                        <TextBox
-                            Grid.Row="6"
-                            Grid.Column="3"
-                            HorizontalAlignment="Stretch"
-                            TextAlignment="Center"
-                            Margin="{StaticResource CommonMargin}"
-                            Text="{Binding Data.MediaLocation.DMDRotation, UpdateSourceTrigger=PropertyChanged}" />
-
-                        <!-- Show Dummy Windows Button -->
-                        <Button
-                            Grid.Row="7"
-                            Grid.Column="1"
-                            Grid.ColumnSpan="3"
-                            Content="Show/Hide Window Locations"
-                            Command="{Binding DummyWindowButton}" />
-
-                        <!-- Thumbnail Resolution-->
-                        <TextBlock
-                            Grid.Row="8"
-                            Grid.Column="0"
-                            Grid.ColumnSpan="3"
-                            Text="Thumbnail Resolution (0 = Full Resolution):"
-                            HorizontalAlignment="Right" />
-                        <TextBox
-                            Grid.Row="8"
-                            Grid.Column="3"
-                            HorizontalAlignment="Stretch"
-                            TextAlignment="Center"
-                            Text="{Binding Data.MediaLocation.ThumbnailResolution}" />
+                <!-- Playfield Rotation -->
+                <TextBox
+                    Grid.Row="6"
+                    Grid.Column="1"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding Data.MediaLocation.PlayfieldRotation, UpdateSourceTrigger=PropertyChanged}" />
 
 
-                    </Grid>
+                <!-- Backglass X Location -->
+                <TextBox
+                    Grid.Row="2"
+                    Grid.Column="2"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding Data.MediaLocation.BackglassLocationX, UpdateSourceTrigger=PropertyChanged}" />
 
-                </Expander>
+                <!-- Backglass Y Location -->
+                <TextBox
+                    Grid.Row="3"
+                    Grid.Column="2"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding Data.MediaLocation.BackglassLocationY, UpdateSourceTrigger=PropertyChanged}" />
 
-                <!-- Keybindings -->
-                <Expander
-                    HorizontalAlignment="Stretch">
-                    <Expander.Header>
+                <!-- Backglass Width -->
+                <TextBox
+                    Grid.Row="4"
+                    Grid.Column="2"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding Data.MediaLocation.BackglassSizeX, UpdateSourceTrigger=PropertyChanged}" />
 
-                        <TextBlock
-                            Grid.Row="0"
-                            Grid.Column="1"
-                            Grid.ColumnSpan="3"
-                            Text="Keybindings"
-                            HorizontalAlignment="Right"
-                            FontWeight="ExtraBold"
-                            FontSize="20" />
+                <!-- Backglass Height -->
+                <TextBox
+                    Grid.Row="5"
+                    Grid.Column="2"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding Data.MediaLocation.BackglassSizeY, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- Backglass Rotation -->
+                <TextBox
+                    Grid.Row="6"
+                    Grid.Column="2"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding Data.MediaLocation.BackglassRotation, UpdateSourceTrigger=PropertyChanged}" />
 
 
-                    </Expander.Header>
+                <!-- DMD X Location -->
+                <TextBox
+                    Grid.Row="2"
+                    Grid.Column="3"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding Data.MediaLocation.DMDLocationX, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- DMD Y Location -->
+                <TextBox
+                    Grid.Row="3"
+                    Grid.Column="3"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding Data.MediaLocation.DMDLocationY, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- DMD Width -->
+                <TextBox
+                    Grid.Row="4"
+                    Grid.Column="3"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding Data.MediaLocation.DMDSizeX, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- DMD Height -->
+                <TextBox
+                    Grid.Row="5"
+                    Grid.Column="3"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding Data.MediaLocation.DMDSizeY, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- DMD Rotation -->
+                <TextBox
+                    Grid.Row="6"
+                    Grid.Column="3"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Margin="{StaticResource CommonMargin}"
+                    Text="{Binding Data.MediaLocation.DMDRotation, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- Show Dummy Windows Button -->
+                <Button
+                    Grid.Row="7"
+                    Grid.Column="1"
+                    Grid.ColumnSpan="3"
+                    Content="Show/Hide Window Locations"
+                    Command="{Binding DummyWindowButton}" />
+
+                <!-- Thumbnail Resolution-->
+                <TextBlock
+                    Grid.Row="8"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    Text="Thumbnail Resolution (0 = Full Resolution):"
+                    HorizontalAlignment="Right" />
+                <TextBox
+                    Grid.Row="8"
+                    Grid.Column="3"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Text="{Binding Data.MediaLocation.ThumbnailResolution}" />
+
+
+            </Grid>
+
+        </Expander>
+
+        <!-- Keybindings -->
+        <Expander
+            DockPanel.Dock="Top"
+            Grid.Column="0"
+            Grid.Row="1"
+            HorizontalAlignment="Stretch"
+            IsExpanded="{Binding CurrentExpanded, Converter={StaticResource ExpandedConverter}, ConverterParameter=2}">
+            <Expander.Header>
+
+                <TextBlock
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Grid.ColumnSpan="3"
+                    Text="Keybindings"
+                    HorizontalAlignment="Left" />
+
+
+            </Expander.Header>
 
 
 
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition
-                                Width="*" />
-                            <ColumnDefinition
-                                Width="3*" />
-                        </Grid.ColumnDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="*" />
+                    <ColumnDefinition
+                        Width="3*" />
+                </Grid.ColumnDefinitions>
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
 
-                        <TextBlock
-                            Grid.Row="0"
-                            Grid.Column="1"
-                            Text="Not Yet Implimented. Change in JSON." />
+                <TextBlock
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Text="Not Yet Implimented. Change in JSON." />
 
-                        <!--<TextBlock
+                <!--<TextBlock
                             Grid.Row="0"
                             Grid.Column="0"
                             Text="Next Table" />
@@ -577,557 +563,844 @@
                             Text="" />-->
 
 
-                    </Grid>
+            </Grid>
 
-                </Expander>
+        </Expander>
 
-                <!-- System Information -->
-                <Expander
-                    HorizontalAlignment="Stretch">
-                    <Expander.Header>
+        <!-- System Information -->
+        <Expander
+            DockPanel.Dock="Top"
+            Grid.Column="0"
+            Grid.Row="2"
+            HorizontalAlignment="Stretch"
+            IsExpanded="{Binding CurrentExpanded, Converter={StaticResource ExpandedConverter}, ConverterParameter=3}">
+            <Expander.Header>
 
-                        <TextBlock
-                            Grid.Row="0"
-                            Grid.Column="1"
-                            Grid.ColumnSpan="1"
-                            Text="System Settings"
-                            HorizontalAlignment="right"
-                            FontWeight="ExtraBold"
-                            FontSize="20" />
+                <TextBlock
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Grid.ColumnSpan="1"
+                    Text="System Settings"
+                    HorizontalAlignment="Left" />
 
 
-                    </Expander.Header>
+            </Expander.Header>
 
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="*"
+                        MaxWidth="200" />
+                    <ColumnDefinition
+                        Width="3*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+
+                </Grid.RowDefinitions>
+
+                <DockPanel
+                    Grid.Column="0"
+                    Grid.Row="0">
+
+                    <TextBlock
+                        Text="System Select"
+                        HorizontalAlignment="Center"
+                        DockPanel.Dock="Top"
+                        FontWeight="Bold"
+                        FontSize="20" />
+
+
+                    <DataGrid
+                        x:Name="SystemSelect"
+                        ItemsSource="{Binding Data.SystemList}"
+                        DisplayMemberPath="Name"
+                        AutoGenerateColumns="False"
+                        SelectedValue="{Binding SelectedSystem, Mode=TwoWay}"
+                        DockPanel.Dock="Top">
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn
+                                Header="System"
+                                Binding="{Binding Name}"
                                 Width="*" />
-                            <ColumnDefinition
-                                Width="3*" />
-                        </Grid.ColumnDefinitions>
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-
-
-                        <!-- System Name -->
-                        <TextBlock
-                            Grid.Row="1"
-                            Grid.Column="0"
-                            Text="Name:"
-                            HorizontalAlignment="Right" />
-                        <TextBox
-                            Grid.Row="1"
-                            Grid.Column="1"
-                            HorizontalAlignment="Stretch"
-                            Text="{Binding SelectedItem.Name, ElementName=SystemSelect, UpdateSourceTrigger=PropertyChanged}" />
-
-                        <!-- Working Path -->
-                        <TextBlock
-                            Grid.Row="2"
-                            Grid.Column="0"
-                            Text="Working Path:"
-                            HorizontalAlignment="Right" />
-                        <TextBox
-                            Grid.Row="2"
-                            Grid.Column="1"
-                            HorizontalAlignment="Stretch"
-                            Text="{Binding SelectedItem.WorkingPath, ElementName=SystemSelect, UpdateSourceTrigger=PropertyChanged}" />
-
-                        <!-- Executable -->
-                        <TextBlock
-                            Grid.Row="3"
-                            Grid.Column="0"
-                            Text="Executable:"
-                            HorizontalAlignment="Right" />
-                        <TextBox
-                            Grid.Row="3"
-                            Grid.Column="1"
-                            HorizontalAlignment="Stretch"
-                            Text="{Binding SelectedItem.Executable, ElementName=SystemSelect, UpdateSourceTrigger=PropertyChanged}" />
-
-                        <!-- Parameters -->
-                        <TextBlock
-                            Grid.Row="4"
-                            Grid.Column="0"
-                            Text="Parameters:"
-                            HorizontalAlignment="Right" />
-                        <TextBox
-                            Grid.Row="4"
-                            Grid.Column="1"
-                            HorizontalAlignment="Stretch"
-                            Text="{Binding SelectedItem.Parameters, ElementName=SystemSelect, UpdateSourceTrigger=PropertyChanged}" />
-
-
-                        <!-- Wait Time -->
-                        <TextBlock
-                            Grid.Row="5"
-                            Grid.Column="0"
-                            Text="Wait Time:"
-                            HorizontalAlignment="Right" />
-                        <TextBox
-                            Grid.Row="5"
-                            Grid.Column="1"
-                            HorizontalAlignment="Stretch"
-                            Text="{Binding SelectedItem.WaitTime, ElementName=SystemSelect, UpdateSourceTrigger=PropertyChanged}" />
-
-
-                    </Grid>
-                </Expander>
-
-                <!-- Table Settings -->
-                <Expander
-                    HorizontalAlignment="Stretch"
-                    IsExpanded="True">
-                    <Expander.Header>
-
-                        <TextBlock
-                            Grid.Row="0"
-                            Grid.Column="1"
-                            Grid.ColumnSpan="2"
-                            Text="Table Settings"
-                            HorizontalAlignment="Right"
-                            FontWeight="ExtraBold"
-                            FontSize="20" />
-
-                    </Expander.Header>
-
-                    <Grid>
-
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition
-                                Width="*" />
-                            <ColumnDefinition
-                                Width="3*" />
-                        </Grid.ColumnDefinitions>
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition
-                                Height="Auto" />
-                            <RowDefinition
-                                Height="Auto" />
-                            <RowDefinition
-                                Height="Auto" />
-                            <RowDefinition
-                                Height="Auto" />
-                            <RowDefinition
-                                Height="Auto" />
-                            <RowDefinition
-                                Height="Auto" />
-                            <RowDefinition
-                                Height="Auto" />
-                            <RowDefinition
-                                Height="Auto" />
-                            <RowDefinition
-                                Height="Auto" />
-                            <RowDefinition
-                                Height="Auto" />
-                            <RowDefinition
-                                Height="Auto" />
-                            <RowDefinition
-                                Height="Auto" />
-                        </Grid.RowDefinitions>
-
-                        <!-- Table Name -->
-                        <TextBlock
-                            Grid.Row="1"
-                            Grid.Column="0"
-                            HorizontalAlignment="Right"
-                            Text="Name:" />
-                        <TextBox
-                            Grid.Row="1"
-                            Grid.Column="1"
-                            HorizontalAlignment="Stretch"
-                            Text="{Binding SelectedItem.Name, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged}" />
-
-                        <!-- Table Description -->
-                        <TextBlock
-                            Grid.Row="2"
-                            Grid.Column="0"
-                            HorizontalAlignment="Right"
-                            Text="Description:" />
-                        <TextBox
-                            Grid.Row="2"
-                            Grid.Column="1"
-                            HorizontalAlignment="Stretch"
-                            Text="{Binding SelectedItem.Description, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged}" />
-
-                        <!-- Manufacturer -->
-                        <TextBlock
-                            Grid.Row="3"
-                            Grid.Column="0"
-                            HorizontalAlignment="Right"
-                            Text="Manufacturer:" />
-                        <TextBox
-                            Grid.Row="3"
-                            Grid.Column="1"
-                            HorizontalAlignment="Stretch"
-                            Text="{Binding SelectedItem.Manufacturer, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged}" />
-
-                        <!-- ROM -->
-                        <TextBlock
-                            Grid.Row="4"
-                            Grid.Column="0"
-                            HorizontalAlignment="Right"
-                            Text="ROM:" />
-                        <TextBox
-                            Grid.Row="4"
-                            Grid.Column="1"
-                            HorizontalAlignment="Stretch"
-                            Text="{Binding SelectedItem.Rom, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged}" />
-
-                        <!--Year -->
-                        <TextBlock
-                            Grid.Row="5"
-                            Grid.Column="0"
-                            HorizontalAlignment="Right"
-                            Text="Year:" />
-                        <TextBox
-                            Grid.Row="5"
-                            Grid.Column="1"
-                            HorizontalAlignment="Stretch"
-                            Text="{Binding SelectedItem.Year, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged}" />
-
-
-                        <!-- System -->
-                        <TextBlock
-                            Grid.Row="6"
-                            Grid.Column="0"
-                            HorizontalAlignment="Right"
-                            Text="System:" />
-                        <ComboBox
-                            Grid.Row="6"
-                            Grid.Column="1"
-                            HorizontalAlignment="Stretch"
-                            ItemsSource="{Binding Data.SystemList}"
-                            DisplayMemberPath="Name"
-                            SelectedValue="{Binding SelectedItem.System, ElementName=TableSelect}"
-                            SelectedValuePath="Name" />
-
-                        <!-- Enabled -->
-                        <Grid
-                            Grid.Row="7"
-                            Grid.Column="1">
-
-
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition
-                                    Width="*" />
-                                <ColumnDefinition
-                                    Width="*" />
-                                <ColumnDefinition
-                                    Width="*" />
-                            </Grid.ColumnDefinitions>
-
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
-
-
-                            <TextBlock
-                                Grid.Row="0"
-                                Grid.Column="0"
-                                HorizontalAlignment="Center"
-                                Text="Enabled" />
-                            <TextBlock
-                                Grid.Row="0"
-                                Grid.Column="1"
-                                HorizontalAlignment="Center"
-                                Text="DMD" />
-                            <TextBlock
-                                Grid.Row="0"
-                                Grid.Column="2"
-                                HorizontalAlignment="Center"
-                                Text="Backglass" />
-                            <Controls:ToggleSwitch
-                                Grid.Row="1"
-                                Grid.Column="0"
-                                HorizontalAlignment="Center"
-                                IsChecked="{Binding SelectedItem.Enabled, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged}" />
-                            <Controls:ToggleSwitch
-                                Grid.Row="1"
-                                Grid.Column="1"
-                                HorizontalAlignment="Center"
-                                IsChecked="{Binding SelectedItem.ShowDMD, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged}" />
-                            <Controls:ToggleSwitch
-                                Grid.Row="1"
-                                Grid.Column="2"
-                                HorizontalAlignment="Center"
-                                IsChecked="{Binding SelectedItem.ShowBackglass, ElementName=TableSelect, UpdateSourceTrigger=PropertyChanged}" />
-
-
-                            <Border
-                                Grid.Row="2"
-                                Grid.Column="0"
-                                Grid.RowSpan="5"
-                                Grid.ColumnSpan="3"
-                                BorderThickness="1"
-                                CornerRadius="16,16,16,16"
-                                BorderBrush="Black" />
-
-
-                            <TextBlock
-                                Grid.Row="2"
-                                Grid.Column="0"
-                                Grid.ColumnSpan="3"
-                                HorizontalAlignment="Center"
-                                Text="Media Audit"
-                                FontWeight="ExtraBold"
-                                FontSize="20" />
-
-                            <TextBlock
-                                Grid.Row="3"
-                                Grid.Column="0"
-                                HorizontalAlignment="Center"
-                                Text="Playfield" />
-                            <CheckBox
-                                Grid.Row="4"
-                                Grid.Column="0"
-                                HorizontalAlignment="Center"
-                                IsHitTestVisible="false"
-                                IsChecked="{Binding SelectedItem.PlayfieldExists, ElementName=TableSelect, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-
-                            <TextBlock
-                                Grid.Row="3"
-                                Grid.Column="1"
-                                HorizontalAlignment="Center"
-                                Text="Backglass" />
-                            <CheckBox
-                                Grid.Row="4"
-                                Grid.Column="1"
-                                HorizontalAlignment="Center"
-                                IsHitTestVisible="false"
-                                IsChecked="{Binding SelectedItem.BackglassExists, ElementName=TableSelect, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-
-                            <TextBlock
-                                Grid.Row="3"
-                                Grid.Column="2"
-                                HorizontalAlignment="Center"
-                                Text="DMD" />
-                            <CheckBox
-                                Grid.Row="4"
-                                Grid.Column="2"
-                                HorizontalAlignment="Center"
-                                IsHitTestVisible="false"
-                                IsChecked="{Binding SelectedItem.DMDExists, ElementName=TableSelect, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-
-                            <TextBlock
-                                Grid.Row="5"
-                                Grid.Column="0"
-                                HorizontalAlignment="Center"
-                                Text="Wheel" />
-                            <CheckBox
-                                Grid.Row="6"
-                                Grid.Column="0"
-                                HorizontalAlignment="Center"
-                                IsHitTestVisible="false"
-                                IsChecked="{Binding SelectedItem.WheelExists, ElementName=TableSelect, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-
-                            <TextBlock
-                                Grid.Row="5"
-                                Grid.Column="1"
-                                HorizontalAlignment="Center"
-                                Text="BG Music" />
-                            <CheckBox
-                                Grid.Row="6"
-                                Grid.Column="1"
-                                HorizontalAlignment="Center"
-                                IsHitTestVisible="false"
-                                IsChecked="{Binding SelectedItem.BGMusicExists, ElementName=TableSelect, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-
-                            <TextBlock
-                                Grid.Row="5"
-                                Grid.Column="2"
-                                HorizontalAlignment="Center"
-                                Text="Launch Audio" />
-                            <CheckBox
-                                Grid.Row="6"
-                                Grid.Column="2"
-                                HorizontalAlignment="Center"
-                                IsHitTestVisible="false"
-                                IsChecked="{Binding SelectedItem.LMusicExists, ElementName=TableSelect, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-
-                        </Grid>
-
-                    </Grid>
-
-
-                </Expander>
-
-
-            </StackPanel>
-
-        </ScrollViewer>
-
-
-
-
-        <!-- Media -->
-        <Grid
-            Grid.Row="0"
-            Grid.Column="2"
-            Grid.RowSpan="2">
-
-            <Grid.RowDefinitions>
-                <RowDefinition
-                    Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition
-                    Width="*" />
-                <ColumnDefinition
-                    Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <DockPanel
-                Grid.Row="0"
-                Grid.Column="0">
-
-
-                <Button
-                    Content="Playfield"
-                    DockPanel.Dock="Top"
-                    HorizontalAlignment="Stretch"
-                    Margin="{StaticResource CommonMargin}" />
-
-                <!-- Playfield Media -->
-                <!--<MediaElement 
-                    x:Name="PlayfieldMedia"
-                    VerticalAlignment="Top" 
-                    HorizontalAlignment="Right" 
-                    LoadedBehavior="Manual" 
-                    IsMuted="True" 
-                    Source="{Binding SelectedItem.Playfield, ElementName=TableSelect}"
-                    MediaEnded="PlayfieldMediaRepeat"
-                    Loaded="PlayfieldMediaRepeat"
-                    DockPanel.Dock="Top">
-                    <MediaElement.LayoutTransform>
-                        <RotateTransform Angle="-90" />
-                    </MediaElement.LayoutTransform>
-                </MediaElement>-->
-                <Image
-                    x:Name="PlayfieldMedia"
-                    VerticalAlignment="Top"
-                    HorizontalAlignment="Right"
-                    DockPanel.Dock="Top"
-                    Margin="{StaticResource CommonMargin}">
-                    <Image.LayoutTransform>
-                        <RotateTransform
-                            Angle="-90" />
-                    </Image.LayoutTransform>
-                </Image>
-
-            </DockPanel>
-
-
-
-            <DockPanel
-                Grid.Row="0"
-                Grid.Column="1">
-
-
-
-                <Button
-                    Content="Backglass"
-                    DockPanel.Dock="Top"
-                    HorizontalAlignment="Stretch"
-                    Margin="{StaticResource CommonMargin}" />
-                <!-- Backglass Media -->
-                <!--<MediaElement
-                    x:Name="BackglassMedia"
-                    VerticalAlignment="Top"
-                    HorizontalAlignment="Left"
-                    LoadedBehavior="Manual"
-                    IsMuted="True"
-                    Source="{Binding SelectedItem.Backglass, ElementName=TableSelect}" 
-                    MediaEnded="BackglassMediaRepeat"
-                    Loaded="BackglassMediaRepeat"
-                    DockPanel.Dock="Top"/>-->
-                <Image
-                    x:Name="BackglassMedia"
-                    VerticalAlignment="Top"
-                    HorizontalAlignment="Left"
-                    DockPanel.Dock="Top"
-                    Margin="{StaticResource CommonMargin}" />
-
-                <Button
-                    Content="DMD"
-                    DockPanel.Dock="Top"
-                    HorizontalAlignment="Stretch"
-                    Margin="{StaticResource CommonMargin}" />
-
-                <!-- DMD Media -->
-                <!--<MediaElement
-                    x:Name="DMDMedia"
-                    VerticalAlignment="Top"
-                    HorizontalAlignment="Left"
-                    LoadedBehavior="Manual" 
-                    IsMuted="True"
-                    Source="{Binding SelectedItem.DMD, ElementName=TableSelect}" 
-                    MediaEnded="DMDMediaRepeat"
-                    Loaded="DMDMediaRepeat"
-                    DockPanel.Dock="Top"/>-->
-                <Image
-                    x:Name="DMDMedia"
-                    VerticalAlignment="Top"
-                    HorizontalAlignment="Left"
-                    DockPanel.Dock="Top"
-                    Margin="{StaticResource CommonMargin}" />
-
-                <Button
-                    Content="Wheel"
-                    DockPanel.Dock="Top"
-                    HorizontalAlignment="Stretch"
-                    Margin="{StaticResource CommonMargin}" />
-
-                <!-- Wheel Media -->
-                <!--<MediaElement
-                    x:Name="WheelMedia"
-                    VerticalAlignment="Top"
-                    LoadedBehavior="Manual"
-                    IsMuted="True"
-                    Source="{Binding SelectedItem.Wheel, ElementName=TableSelect}" 
-                    MediaEnded="WheelMediaRepeat"
-                    Loaded="WheelMediaRepeat"
-                    DockPanel.Dock="Top">
-
-
-                    <MediaElement.OpacityMask>
-                        <ImageBrush ImageSource="{Binding SelectedItem.Wheel, ElementName=TableSelect}"/>
-                    </MediaElement.OpacityMask>
-                    
-                </MediaElement>-->
-                <Image
-                    x:Name="WheelMedia"
-                    VerticalAlignment="Top"
-                    DockPanel.Dock="Top"
-                    Source="{Binding SelectedItem.Wheel, ElementName=TableSelect}" />
-
-            </DockPanel>
-
-
-
-        </Grid>
-
-    </Grid>
+                        </DataGrid.Columns>
+
+                    </DataGrid>
+
+                </DockPanel>
+
+                <Grid
+                    Grid.Column="1"
+                    Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition
+                            Width="*"
+                            MaxWidth="200" />
+                        <ColumnDefinition
+                            Width="3*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+
+
+
+                    <!-- System Name -->
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Text="Name:"
+                        HorizontalAlignment="Right" />
+                    <TextBox
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        HorizontalAlignment="Stretch"
+                        Text="{Binding SelectedItem.Name, ElementName=SystemSelect, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <!-- Working Path -->
+                    <TextBlock
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Text="Working Path:"
+                        HorizontalAlignment="Right" />
+                    <TextBox
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        HorizontalAlignment="Stretch"
+                        Text="{Binding SelectedItem.WorkingPath, ElementName=SystemSelect, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <!-- Executable -->
+                    <TextBlock
+                        Grid.Row="3"
+                        Grid.Column="0"
+                        Text="Executable:"
+                        HorizontalAlignment="Right" />
+                    <TextBox
+                        Grid.Row="3"
+                        Grid.Column="1"
+                        HorizontalAlignment="Stretch"
+                        Text="{Binding SelectedItem.Executable, ElementName=SystemSelect, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <!-- Parameters -->
+                    <TextBlock
+                        Grid.Row="4"
+                        Grid.Column="0"
+                        Text="Parameters:"
+                        HorizontalAlignment="Right" />
+                    <TextBox
+                        Grid.Row="4"
+                        Grid.Column="1"
+                        HorizontalAlignment="Stretch"
+                        Text="{Binding SelectedItem.Parameters, ElementName=SystemSelect, UpdateSourceTrigger=PropertyChanged}" />
+
+
+                    <!-- Wait Time -->
+                    <TextBlock
+                        Grid.Row="5"
+                        Grid.Column="0"
+                        Text="Wait Time:"
+                        HorizontalAlignment="Right" />
+                    <TextBox
+                        Grid.Row="5"
+                        Grid.Column="1"
+                        HorizontalAlignment="Stretch"
+                        Text="{Binding SelectedItem.WaitTime, ElementName=SystemSelect, UpdateSourceTrigger=PropertyChanged}" />
+
+
+                    <TextBlock
+                        Grid.Row="6"
+                        Grid.Column="0"
+                        Text="Window Name:"
+                        HorizontalAlignment="Right" />
+                    <TextBox
+                        Grid.Row="6"
+                        Grid.Column="1"
+                        HorizontalAlignment="Stretch"
+                        Text="{Binding SelectedItem.WindowName, ElementName=SystemSelect, UpdateSourceTrigger=PropertyChanged}" />
+
+                </Grid>
+
+
+            </Grid>
+
+
+        </Expander>
+
+        <!-- Table Settings -->
+        <Expander
+            DockPanel.Dock="Top"
+            Grid.Column="0"
+            Grid.Row="3"
+            VerticalAlignment="Top"
+            IsExpanded="{Binding CurrentExpanded, Converter={StaticResource ExpandedConverter}, ConverterParameter=4}">
+            <Expander.Header>
+
+                <TextBlock
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Grid.ColumnSpan="2"
+                    Text="Table Settings"
+                    HorizontalAlignment="Left" />
+
+            </Expander.Header>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="3*" />
+                    <ColumnDefinition
+                        Width="*" />
+                    <ColumnDefinition
+                        Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition
+                        Height="*" />
+                </Grid.RowDefinitions>
+
+
+                <Grid
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+
+
+                    <TextBlock
+                        Grid.Column="0"
+                        Grid.Row="0"
+                        Text="Table Select"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Top"
+                        FontWeight="Bold"
+                        FontSize="20" />
+
+
+                    <DataGrid
+                        Grid.Column="0"
+                        Grid.Row="1"
+                        x:Name="TableSelect"
+                        ItemsSource="{Binding Data.TableList}"
+                        DisplayMemberPath="Name"
+                        SelectionMode="Single"
+                        AutoGenerateColumns="False"
+                        SelectedValue="{Binding SelectedTable, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, NotifyOnSourceUpdated=True, NotifyOnTargetUpdated=True}"
+                        ScrollViewer.CanContentScroll="True"
+                        ScrollViewer.VerticalScrollBarVisibility="Auto"
+                        ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                        SelectionChanged="TableSelect_SelectionChanged"
+                        VerticalAlignment="Top"
+                        RowDetailsVisibilityMode="Collapsed"
+                        GridLinesVisibility="All"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Stretch">
+
+
+                        <DataGrid.Columns>
+                            <!--<DataGridCheckBoxColumn 
+                        Header="Enabled"
+                        Binding="{Binding Enabled}"/>-->
+
+                            <DataGridTemplateColumn
+                                Header="Enabled"
+                                SortMemberPath="Enabled">
+
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel
+                                            Orientation="Horizontal">
+                                            <Button
+                                                Content="{iconPacks:Material Kind=XboxController}" 
+                                                ToolTip="Play"
+                                                Command="{Binding DataContext.StartTableCommand , RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"/>
+                                            <Controls:ToggleSwitch
+                                                Grid.Row="1"
+                                                Grid.Column="0"
+                                                HorizontalAlignment="Center"
+                                                IsChecked="{Binding Enabled, UpdateSourceTrigger=PropertyChanged}" />
+                                        </StackPanel>
+                                      
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTextColumn
+                                Header="Table"
+                                Binding="{Binding Description}" />
+                            <DataGridTextColumn
+                                Header="Name"
+                                Binding="{Binding Name}" />
+                            <DataGridTextColumn
+                                Header="Manufacturer"
+                                Binding="{Binding Manufacturer}" />
+                            <DataGridTextColumn
+                                Header="Year"
+                                Binding="{Binding Year}" />
+
+                            <DataGridTemplateColumn
+                                Header="System"
+                                SortMemberPath="System">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ComboBox
+                                            IsEditable="False"
+                                            Grid.Row="6"
+                                            Grid.Column="1"
+                                            HorizontalAlignment="Stretch"
+                                            ItemsSource="{Binding DataContext.Data.SystemList, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                            DisplayMemberPath="Name"
+                                            SelectedValue="{Binding System}"
+                                            SelectedValuePath="Name" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn
+                                Header="Backglass"
+                                SortMemberPath="ShowBackglass">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Controls:ToggleSwitch
+                                            Grid.Row="1"
+                                            Grid.Column="0"
+                                            HorizontalAlignment="Center"
+                                            IsChecked="{Binding ShowBackglass, UpdateSourceTrigger=PropertyChanged}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn
+                                Header="DMD"
+                                SortMemberPath="ShowDMD">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Controls:ToggleSwitch
+                                            Grid.Row="1"
+                                            Grid.Column="0"
+                                            HorizontalAlignment="Center"
+                                            IsChecked="{Binding ShowDMD, UpdateSourceTrigger=PropertyChanged}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn
+                                SortMemberPath="PlayfieldExists">
+                                <DataGridTemplateColumn.Header>
+                                    <TextBlock
+                                        Text="P"
+                                        ToolTip="Playfield Video Exists" />
+                                </DataGridTemplateColumn.Header>
+                                <DataGridTemplateColumn.CellTemplate>
+
+                                    <DataTemplate>
+                                        <StackPanel
+                                            Orientation="Horizontal">
+
+                                            <Button
+                                                Content="{iconPacks:Material Kind=PlayBoxOutline}"
+                                                Command="{Binding DataContext.PreviewPlayfieldCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                                ToolTip="Preview Playfield Video">
+                                                <Button.Style>
+                                                    <Style
+                                                        TargetType="Button"
+                                                        BasedOn="{StaticResource {x:Type Button}}">
+                                                        <Style.Triggers>
+                                                            <DataTrigger
+                                                                Binding="{Binding PlayfieldExists}"
+                                                                Value="True">
+                                                                <Setter
+                                                                    Property="Background"
+                                                                    Value="{StaticResource FileExists}" />
+                                                            </DataTrigger>
+
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                            <!--<Button
+                                                Content="{iconPacks:Material Kind=FileImport}"
+                                                Command="{Binding DataContext.GetPlayfieldCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                                ToolTip="Import Playfield Video" />-->
+                                        </StackPanel>
+
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn
+                                SortMemberPath="BackglassExists">
+                                <DataGridTemplateColumn.Header>
+                                    <TextBlock
+                                        Text="B"
+                                        ToolTip="Backglass Video Exists" />
+                                </DataGridTemplateColumn.Header>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel
+                                            Orientation="Horizontal">
+                                            <!--<CheckBox
+                                                IsHitTestVisible="False"
+                                                HorizontalAlignment="Center"
+                                                IsChecked="{Binding BackglassExists, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />-->
+                                            <Button
+                                                Content="{iconPacks:Material Kind=PlayBoxOutline}"
+                                                Command="{Binding DataContext.PreviewBackglassCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                                ToolTip="Preview Backglass Video">
+                                                <Button.Style>
+                                                    <Style
+                                                        TargetType="Button"
+                                                        BasedOn="{StaticResource {x:Type Button}}">
+                                                        <Style.Triggers>
+                                                            <DataTrigger
+                                                                Binding="{Binding BackglassExists}"
+                                                                Value="True">
+                                                                <Setter
+                                                                    Property="Background"
+                                                                    Value="{StaticResource FileExists}" />
+                                                            </DataTrigger>
+
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                            <!--<Button
+                                                Content="{iconPacks:Material Kind=FileImport}"
+                                                Command="{Binding DataContext.GetBackglassCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                                ToolTip="Import Backglass Video" />-->
+                                        </StackPanel>
+
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn
+                                SortMemberPath="DMDExists">
+                                <DataGridTemplateColumn.Header>
+                                    <TextBlock
+                                        Text="D"
+                                        ToolTip="DMD Video Exists" />
+                                </DataGridTemplateColumn.Header>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel
+                                            Orientation="Horizontal">
+                                            <!--<CheckBox
+                                                IsHitTestVisible="False"
+                                                HorizontalAlignment="Center"
+                                                IsChecked="{Binding DMDExists, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />-->
+                                            <Button
+                                                Content="{iconPacks:Material Kind=PlayBoxOutline}"
+                                                Command="{Binding DataContext.PreviewDMDCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                                ToolTip="Preview DMD Video">
+                                                <Button.Style>
+                                                    <Style
+                                                        TargetType="Button"
+                                                        BasedOn="{StaticResource {x:Type Button}}">
+                                                        <Style.Triggers>
+                                                            <DataTrigger
+                                                                Binding="{Binding DMDExists}"
+                                                                Value="True">
+                                                                <Setter
+                                                                    Property="Background"
+                                                                    Value="{StaticResource FileExists}" />
+                                                            </DataTrigger>
+
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                            <!--<Button
+                                                Content="{iconPacks:Material Kind=FileImport}"
+                                                Command="{Binding DataContext.GetDMDCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                                ToolTip="Import DMD Video" />-->
+                                        </StackPanel>
+
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn
+                                SortMemberPath="WheelExists">
+                                <DataGridTemplateColumn.Header>
+                                    <TextBlock
+                                        Text="W"
+                                        ToolTip="Wheel Image Exists" />
+                                </DataGridTemplateColumn.Header>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel
+                                            Orientation="Horizontal">
+                                            <!--<CheckBox
+                                                IsHitTestVisible="False"
+                                                HorizontalAlignment="Center"
+                                                IsChecked="{Binding WheelExists, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />-->
+                                            <Button
+                                                Content="{iconPacks:Material Kind=PlayBoxOutline}"
+                                                Command="{Binding DataContext.PreviewWheelCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                                ToolTip="Preview Wheel Image">
+                                                <Button.Style>
+                                                    <Style
+                                                        TargetType="Button"
+                                                        BasedOn="{StaticResource {x:Type Button}}">
+                                                        <Style.Triggers>
+                                                            <DataTrigger
+                                                                Binding="{Binding WheelExists}"
+                                                                Value="True">
+                                                                <Setter
+                                                                    Property="Background"
+                                                                    Value="{StaticResource FileExists}" />
+                                                            </DataTrigger>
+
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                            <!--<Button
+                                                Content="{iconPacks:Material Kind=FileImport}"
+                                                Command="{Binding DataContext.GetWheelCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                                ToolTip="Import Wheel Image" />-->
+                                        </StackPanel>
+
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn
+                                SortMemberPath="BGMusicExists">
+                                <DataGridTemplateColumn.Header>
+                                    <TextBlock
+                                        Text="A"
+                                        ToolTip="Table Audio Exists" />
+                                </DataGridTemplateColumn.Header>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel
+                                            Orientation="Horizontal">
+                                            <!--<CheckBox
+                                                IsHitTestVisible="False"
+                                                HorizontalAlignment="Center"
+                                                IsChecked="{Binding BGMusicExists, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />-->
+                                            <Button
+                                                Content="{iconPacks:Material Kind=PlayBoxOutline}"
+                                                Command="{Binding DataContext.PreviewTableAudioCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                                ToolTip="Preview Table Audio">
+                                                <Button.Style>
+                                                    <Style
+                                                        TargetType="Button"
+                                                        BasedOn="{StaticResource {x:Type Button}}">
+                                                        <Style.Triggers>
+                                                            <DataTrigger
+                                                                Binding="{Binding BGMusicExists}"
+                                                                Value="True">
+                                                                <Setter
+                                                                    Property="Background"
+                                                                    Value="{StaticResource FileExists}" />
+                                                            </DataTrigger>
+
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                            <!--<Button
+                                                Content="{iconPacks:Material Kind=FileImport}"
+                                                Command="{Binding DataContext.GetTableAudioCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                                ToolTip="Import Table Audio" />-->
+                                        </StackPanel>
+
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn
+                                SortMemberPath="LMusicExists">
+                                <DataGridTemplateColumn.Header>
+                                    <TextBlock
+                                        Text="L"
+                                        ToolTip="Launch Audio Exists" />
+                                </DataGridTemplateColumn.Header>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel
+                                            Orientation="Horizontal">
+                                            <!--<CheckBox
+                                                IsHitTestVisible="False"
+                                                HorizontalAlignment="Center"
+                                                IsChecked="{Binding LMusicExists, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />-->
+                                            <Button
+                                                Content="{iconPacks:Material Kind=PlayBoxOutline}"
+                                                Command="{Binding DataContext.PreviewLaunchAudioCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                                ToolTip="Preview Launch Audio">
+                                                <Button.Style>
+                                                    <Style
+                                                        TargetType="Button"
+                                                        BasedOn="{StaticResource {x:Type Button}}">
+                                                        <Style.Triggers>
+                                                            <DataTrigger
+                                                                Binding="{Binding LMusicExists}"
+                                                                Value="True">
+                                                                <Setter
+                                                                    Property="Background"
+                                                                    Value="{StaticResource FileExists}" />
+                                                            </DataTrigger>
+
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                            <!--<Button
+                                                Content="{iconPacks:Material Kind=FileImport}"
+                                                Command="{Binding DataContext.GetTableAudioCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                                ToolTip="Import Launch Audio" />-->
+                                        </StackPanel>
+
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+
+
+
+                        </DataGrid.Columns>
+
+                        <DataGrid.RowDetailsTemplate>
+                            <DataTemplate>
+
+
+                                <Grid
+                                    HorizontalAlignment="Left">
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <!-- Playfield Row-->
+                                        <RowDefinition />
+                                        <!-- Backglass Row-->
+                                        <RowDefinition />
+                                        <!-- DMD Row -->
+                                        <RowDefinition />
+                                        <!-- Wheel Row -->
+                                        <RowDefinition />
+                                        <!-- Table Audio -->
+                                        <RowDefinition />
+                                        <!-- Launch Audio-->
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+
+
+                                    <TextBlock
+                                        Grid.Row="0"
+                                        Grid.Column="0"
+                                        Text="Playfield: "
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center" />
+
+                                    <StackPanel
+                                        Grid.Row="0"
+                                        Grid.Column="1"
+                                        Orientation="Horizontal">
+
+
+                                        <CheckBox
+                                            IsHitTestVisible="False"
+                                            HorizontalAlignment="Center"
+                                            IsChecked="{Binding PlayfieldExists, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        <Button
+                                            Content="{iconPacks:Material Kind=PlayBoxOutline}"
+                                            Command="{Binding DataContext.PreviewPlayfieldCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                            ToolTip="Preview Playfield Video" />
+                                        <Button
+                                            Content="{iconPacks:Material Kind=FileImport}"
+                                            Command="{Binding DataContext.GetPlayfieldCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                            ToolTip="Import Playfield Video" />
+
+
+
+
+                                    </StackPanel>
+
+                                    <TextBlock
+                                        Grid.Row="1"
+                                        Grid.Column="0"
+                                        Text="Backglass: "
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center" />
+                                    <StackPanel
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        Orientation="Horizontal">
+
+                                        <CheckBox
+                                            IsHitTestVisible="False"
+                                            HorizontalAlignment="Center"
+                                            IsChecked="{Binding BackglassExists, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        <Button
+                                            Content="{iconPacks:Material Kind=PlayBoxOutline}"
+                                            Command="{Binding DataContext.PreviewBackglassCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                            ToolTip="Preview Backglass Video" />
+                                        <Button
+                                            Content="{iconPacks:Material Kind=FileImport}"
+                                            Command="{Binding DataContext.GetBackglassCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                            ToolTip="Import Backglass Video" />
+                                    </StackPanel>
+
+                                    <TextBlock
+                                        Grid.Row="2"
+                                        Grid.Column="0"
+                                        Text="DMD: "
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center" />
+                                    <StackPanel
+                                        Grid.Row="2"
+                                        Grid.Column="1"
+                                        Orientation="Horizontal">
+
+                                        <CheckBox
+                                            IsHitTestVisible="False"
+                                            HorizontalAlignment="Center"
+                                            IsChecked="{Binding DMDExists, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        <Button
+                                            Content="{iconPacks:Material Kind=PlayBoxOutline}"
+                                            Command="{Binding DataContext.PreviewDMDCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                            ToolTip="Preview DMD Video" />
+                                        <Button
+                                            Content="{iconPacks:Material Kind=FileImport}"
+                                            Command="{Binding DataContext.GetDMDCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                            ToolTip="Import DMD Video" />
+                                    </StackPanel>
+
+                                    <TextBlock
+                                        Grid.Row="3"
+                                        Grid.Column="0"
+                                        Text="Wheel: "
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center" />
+                                    <StackPanel
+                                        Grid.Row="3"
+                                        Grid.Column="1"
+                                        Orientation="Horizontal">
+
+                                        <CheckBox
+                                            IsHitTestVisible="False"
+                                            HorizontalAlignment="Center"
+                                            IsChecked="{Binding WheelExists, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        <Button
+                                            Content="{iconPacks:Material Kind=PlayBoxOutline}"
+                                            Command="{Binding DataContext.PreviewWheelCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                            ToolTip="Preview Wheel Image" />
+                                        <Button
+                                            Content="{iconPacks:Material Kind=FileImport}"
+                                            Command="{Binding DataContext.GetWheelCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                            ToolTip="Import Wheel Image" />
+                                    </StackPanel>
+
+                                    <TextBlock
+                                        Grid.Row="4"
+                                        Grid.Column="0"
+                                        Text="Table Audio: "
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center" />
+                                    <StackPanel
+                                        Grid.Row="4"
+                                        Grid.Column="1"
+                                        Orientation="Horizontal">
+
+                                        <CheckBox
+                                            IsHitTestVisible="False"
+                                            HorizontalAlignment="Center"
+                                            IsChecked="{Binding BGMusicExists, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        <Button
+                                            Content="{iconPacks:Material Kind=PlayBoxOutline}"
+                                            Command="{Binding DataContext.PreviewTableAudioCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                            ToolTip="Preview Table Audio" />
+                                        <Button
+                                            Content="{iconPacks:Material Kind=FileImport}"
+                                            Command="{Binding DataContext.GetTableAudioCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                            ToolTip="Import Table Audio" />
+                                    </StackPanel>
+
+                                    <TextBlock
+                                        Grid.Row="5"
+                                        Grid.Column="0"
+                                        Text="Launch Audio: "
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center" />
+                                    <StackPanel
+                                        Grid.Row="5"
+                                        Grid.Column="1"
+                                        Orientation="Horizontal">
+
+                                        <CheckBox
+                                            IsHitTestVisible="False"
+                                            HorizontalAlignment="Center"
+                                            IsChecked="{Binding LMusicExists, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        <Button
+                                            Content="{iconPacks:Material Kind=PlayBoxOutline}"
+                                            Command="{Binding DataContext.PreviewLaunchAudioCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                            ToolTip="Preview Launch Audio" />
+                                        <Button
+                                            Content="{iconPacks:Material Kind=FileImport}"
+                                            Command="{Binding DataContext.GetTableAudioCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                            ToolTip="Import Launch Audio" />
+                                    </StackPanel>
+
+
+
+                                </Grid>
+
+
+
+
+                            </DataTemplate>
+
+                        </DataGrid.RowDetailsTemplate>
+
+                    </DataGrid>
+
+
+
+                </Grid>
+
+
+
+
+
+
+
+            </Grid>
+
+
+
+
+        </Expander>
+
+    </DockPanel>
+
+
+
+
 
 
 

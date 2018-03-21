@@ -47,7 +47,7 @@ namespace PinballFrontEnd.View
 
         public MediaView()
         {
-            
+
             //this.DataContext = this;
             InitializeComponent();
 
@@ -72,7 +72,7 @@ namespace PinballFrontEnd.View
 
 
             // SETUP VLC LIBRARY
-        
+
             //Create Video Source Provider
             sourceProvider = new VlcVideoSourceProvider(this.Dispatcher);
             sourceProvider.CreatePlayer(Model.VlcGlobal.GetVlcLibrary());
@@ -106,7 +106,9 @@ namespace PinballFrontEnd.View
             //Console.WriteLine("Visibility Timer Tick");
 
             //TestMe.Visibility = Visibility.Visible;
-            PreloadImage.Visibility = Visibility.Hidden;
+            if (MediaUri != null)
+                if (File.Exists(MediaUri.LocalPath))
+                    PreloadImage.Visibility = Visibility.Hidden;
         }
 
         private void VidTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -124,7 +126,7 @@ namespace PinballFrontEnd.View
 
                     //throw;
                 }
-               
+
                 return;
             }
 
@@ -165,10 +167,13 @@ namespace PinballFrontEnd.View
         {
             var wnd = (Window)sender;
 
-            if(wnd.Visibility == Visibility.Visible)
+            if (wnd.Visibility == Visibility.Visible)
             {
-                sourceProvider.MediaPlayer.Play();
-            } else
+                if (MediaUri != null)
+                    if (File.Exists(MediaUri.LocalPath))
+                        sourceProvider.MediaPlayer.Play();
+            }
+            else
             {
                 sourceProvider.MediaPlayer.Pause();
             }

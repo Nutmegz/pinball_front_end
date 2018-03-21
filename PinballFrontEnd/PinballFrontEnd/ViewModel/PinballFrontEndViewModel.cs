@@ -34,11 +34,13 @@ namespace PinballFrontEnd.ViewModel
     public class PinballFrontEndViewModel : ViewModelBase
     {
 
+        public static string ProgramName { get; set; } = "PFE Main Window";
+
         //Setup Class Logger
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
         //Database Path
-        private static string databasepath = $@"{ProgramPath.Value}\database.json";
+        private static string databasepath = $@"{ProgramPath.Value}database.json";
 
         //Tell Windows to be on top
         public bool TopMost { get; set; } = true;
@@ -65,8 +67,6 @@ namespace PinballFrontEnd.ViewModel
         //Global Keyboard Listener Hook
         private LowLevelKeyboardListener _listener;
 
-
-
         //Default Constructor
         public PinballFrontEndViewModel()
         {
@@ -79,14 +79,29 @@ namespace PinballFrontEnd.ViewModel
 
             //InitializePlayers();
             //LoadDatabase();
+
             InitializeKeyboardHook();
             InitalizeThumbnails();
             InitializeBGMusic();
             RandomTable();
             InitalizeWindows();
 
-            //WindowControl.HideTaskbar();
-            //WindowControl.LockForground();
+
+            //StartEverything();
+        }
+
+        private async void StartEverything()
+        {
+            Data = new PinballData();
+            await Task.Run(() => Data.LoadDatabase(databasepath));
+
+            //InitializePlayers();
+            //LoadDatabase();
+            await Task.Run(() => InitializeKeyboardHook());
+            await Task.Run(() => InitalizeThumbnails());
+            await Task.Run(() => InitializeBGMusic());
+            RandomTable();
+            InitalizeWindows();
         }
 
         //Startup addon windows
@@ -188,11 +203,16 @@ namespace PinballFrontEnd.ViewModel
 
             TopMost = false;
             tableManager = new View.TableManagerView(Data);
+            
+            //Show taskbar and cursor
             WindowControl.ShowTaskbar();
+            WindowControl.ShowCursor();
+
+            //Start window
             tableManager.Show();
         }
 
-        private void ExitTableManager()
+        private async void ExitTableManager()
         {
             Data.SortSystemsTables();
             logger.Trace($"{RunMode.ToString()} : Exit Table Manager");
@@ -202,82 +222,60 @@ namespace PinballFrontEnd.ViewModel
             PlayfieldVisibility = Visibility.Visible;
             ResumeBGMusic();
 
+
             tableManager.Close();
             TopMost = true;
-            WindowControl.SetFocus("Pinball Front End");
+
+            //Focus PFE Main Window
+            await Task.Run(() => WindowControl.SetFocusForeground(WindowControl.FindProcessWindow(Process.GetCurrentProcess().ProcessName, ProgramName),true));
+
+            //Hide taskbar and cursor
+            WindowControl.HideTaskbar();
+            WindowControl.HideCursor();
 
             RunMode = Mode.FrontEnd;
             logger.Trace($"Setting Mode to {RunMode.ToString()}");
         }
 
-        private async void StartTable()
+        private async void StartTable(int mainThread)
         {
             logger.Info($"{RunMode.ToString()}: Starting table: {CurrentTable.Name}");
+            RunMode = Mode.SystemRunning;
+            logger.Trace($"Setting Mode to {RunMode.ToString()}");
 
             //Play Launch Music
             LMusicPlayer.Open(CurrentTable.LMusic);
             LMusicPlayer.Play();
 
-            //Get Assosiated System to Launch
-            var system = Data.FindSystem(CurrentTable);
+            var system = Data.FindSystem(CurrentTable);           // get system to launch
+            PinballFunctions.StartTable(system, CurrentTable);    // launch system
 
-            //Replace [TABLENAME]
-            var regex = new Regex(@"\[TABLENAME\]");
-            var param = regex.Replace(system.Parameters, CurrentTable.Name);
 
-            //Replace [SYSTEMPATH]
-            regex = new Regex(@"\[SYSTEMPATH\]");
-            param = regex.Replace(param, system.WorkingPath);
-
-            //set windows to be topmost
-            //TopMost = true;
-
-            logger.Debug(param);
-
-            //Setup Process to launch
-            var proc = new Process();
-            proc.StartInfo.FileName = system.WorkingPath + "\\" + system.Executable;
-            proc.StartInfo.Arguments = param;
-            proc.Start();
-
-            //procID = proc.Id;
-            //Console.WriteLine(proc.Id);
-
-            //Make sure this program stays on top while loading
-            //Show Loading Screen (Needs Completed)
-            WindowControl.SetFocus("Pinball Front End");
 
             Stopwatch watchdog = new Stopwatch();
             watchdog.Reset();
             watchdog.Start();
 
-            //Mute Process
-            //Hunt for system process (Allows us to find the Steam Game since original process is steam)
-            int gameID = 0;
-            //Console.WriteLine(game.Id);
 
+            //Wait for process to start
+            logger.Info($"Starting Game Process, Name: {system.Name}");
+            await Task.Run(() => { while (Process.GetProcessesByName(system.Name).Length <= 0) ; } );
+            var game = Process.GetProcessesByName(system.Name).First();
+            logger.Info($"Game Process Found, Handle: {game.Id}");
+
+            //keep hiding while window is starting
             await Task.Run(() =>
             {
-                while (gameID == 0)
+                do
                 {
-                    var procs = Process.GetProcesses();
-                    foreach (Process procy in procs)
-                    {
-                        //Console.WriteLine(procy.ProcessName);
-                        if (procy.ProcessName.IndexOf(Data.FindSystem(CurrentTable).Name, 0, StringComparison.CurrentCultureIgnoreCase) > -1)
-                        {
-                            gameID = procy.Id;
-                            logger.Info($"Found Program: {Data.FindSystem(CurrentTable).Name.ToLower()}");
-                            break;
-                        }
-                        if (watchdog.ElapsedMilliseconds > 10000)
-                        {
-                            logger.Error("Can't Find System Process");
-                            break;
-                        }
-                    }
-                }
+                    WindowControl.HideAllProcessWindows(system.Name);
+                } while (WindowControl.FindProcessWindow(system.Name, system.WindowName) == IntPtr.Zero);
+                WindowControl.HideAllProcessWindows(system.Name);
             });
+            var windowHandle = WindowControl.FindProcessWindow(system.Name, system.WindowName);
+            logger.Info($"Game Window Found, Process: {system.Name}, Name: {system.WindowName}, Handle: {windowHandle}");
+            
+
 
 
 
@@ -287,95 +285,83 @@ namespace PinballFrontEnd.ViewModel
             logger.Info("Muting System");
             await Task.Run(() =>
             {
-               while (VolumeMixer.GetApplicationMute(gameID) != true)
-               {
-                   //Console.WriteLine("Trying to Mute");
-                   VolumeMixer.SetApplicationMute(gameID, true);
-                   WindowControl.SetFocus("Pinball Front End");
-                   if (watchdog.ElapsedMilliseconds > 10000)
-                   {
-                       logger.Error("Can't Mute System");
-                       break;
-                   }
-               }
+                while (VolumeMixer.GetApplicationMute(game.Id) != true)
+                {
+                    //Console.WriteLine("Trying to Mute");
+                    VolumeMixer.SetApplicationMute(game.Id, true);
+                    //WindowControl.SetFocus(ProgramName);
+                    if (watchdog.ElapsedMilliseconds > 10000)
+                    {
+                        logger.Warn($"Can't Mute System, Process ID: {game.Id}");
+                        break;
+                    }
+                }
             });
 
 
+           
 
-
-
-            await Task.Run(() => Task.Delay(system.WaitTime * 1000)); // sleep (Need to update to keep videos playing)
+            //Wait for Game to load
+            await Task.Run(() => Task.Delay(system.WaitTime * 1000));
             BGMusicPlayer.Pause();
 
             //Unmute
             watchdog.Restart();
             logger.Info("Unmuting System");
-            while (VolumeMixer.GetApplicationMute(gameID) != false)
+            while (VolumeMixer.GetApplicationMute(game.Id) != false)
             {
                 //Console.WriteLine("Trying to Unmute");
-                VolumeMixer.SetApplicationMute(gameID, false);
-                WindowControl.SetFocus("Pinball Front End");
+                VolumeMixer.SetApplicationMute(game.Id, false);
+                //WindowControl.SetFocus(ProgramName);
                 if (watchdog.ElapsedMilliseconds > 10000)
                 {
-                    logger.Error("Can't Unmute System");
+                    logger.Warn($"Can't Unmute System, Process ID: {game.Id}");
                     break;
                 }
             }
 
 
-            //TopMost = false;
-            WindowControl.SetFocus($"{system.Name}");
-
-
+            //Show Game Window
+            WindowControl.ShowWindow(windowHandle, true);
+         
+            //Focus GAME
+            WindowControl.SetFocusForeground(windowHandle, true);
 
             //Hide Selected Windows
             logger.Trace("Setting Window Visibility");
             BackglassWindow.Visibility = CurrentTable.ShowBackglass ? Visibility.Visible : Visibility.Hidden;
             DMDWindow.Visibility = CurrentTable.ShowDMD ? Visibility.Visible : Visibility.Hidden;
-            //PlayfieldWindow.Visibility = Visibility.Hidden;
             PlayfieldVisibility = Visibility.Hidden;
 
-
-            RunMode = Mode.SystemRunning;
-            logger.Trace($"Setting Mode to {RunMode.ToString()}");
         }
 
-        private void ExitTable()
+        private async void ExitTable()
         {
             logger.Info($"{RunMode.ToString()} : Exit System");
             try
             {
-                var procs = Process.GetProcesses();
-                foreach (Process proc in procs)
-                {
-                    //Console.WriteLine(proc.ProcessName);
-                    if (proc.ProcessName.IndexOf(Data.FindSystem(CurrentTable).Name, 0, StringComparison.CurrentCultureIgnoreCase) > -1)
-                    {
-                        logger.Info($"Ending Program: {Data.FindSystem(CurrentTable).Name.ToLower()}");
-                        proc.Kill();
 
-                    }
-                    //logger.Debug(proc.ProcessName);
-                }
-
-                //Show Media
+                //Show Media (must show before exiting system otherwise there is a focus issue)
                 BackglassWindow.Visibility = Visibility.Visible;
                 DMDWindow.Visibility = Visibility.Visible;
-                PlayfieldVisibility = Visibility.Visible;
+                PlayfieldVisibility = Visibility.Visible; //must be last one shown
+
+
+                var proc = WindowControl.FindProcess(Data.FindSystem(CurrentTable).Name);
+                proc.CloseMainWindow();
+                await Task.Run(() => proc.WaitForExit(2000)); //Give the window 2 seconds the exit gracefully
+                if (!proc.HasExited)
+                    proc.Kill(); //Force close
 
                 //Resume Music
                 ResumeBGMusic();
 
-                WindowControl.SetFocus("Pinball Front End");
+                WindowControl.SetFocusForeground(ProgramName);
+                logger.Info($"Foreground Window: {WindowControl.GetForegroundWindow()}");
+                logger.Info($"Foreground Title: {WindowControl.GetActiveWindowTitle()}");
 
                 RunMode = Mode.FrontEnd;
                 logger.Trace($"Setting Mode to {RunMode.ToString()}");
-                //var proc = Process.GetProcessById(procID);
-                //proc.Kill();
-                //if (proc.Length > 0)
-                //{
-                //    proc[0].Kill();
-                //}
 
             }
             catch (Exception)
@@ -388,6 +374,16 @@ namespace PinballFrontEnd.ViewModel
         //Handle Keyboard Message
         private void KeyboardListner_OnKeyPressed(object sender, KeyPressedArgs e)
         {
+
+            //Keep window in focus always when in Front End Mode
+            if (RunMode == Mode.FrontEnd)
+            {
+                //WindowControl.UnlockForground();
+                //WindowControl.SetFocusForeground(ProgramName);
+                //WindowControl.LockForground();
+            }
+
+
             //EXIT KEY
             if (e.KeyPressed == Data.BIND.KEYBIND_EXIT)
             {
@@ -411,7 +407,8 @@ namespace PinballFrontEnd.ViewModel
                 switch (RunMode)
                 {
                     case Mode.FrontEnd:
-                        StartTable();
+                        WindowControl.UnlockForground();
+                        StartTable(Process.GetCurrentProcess().Id);
                         break;
                 }
             }
@@ -419,6 +416,10 @@ namespace PinballFrontEnd.ViewModel
             //NEXT KEY
             if (e.KeyPressed == Data.BIND.KEYBIND_NEXT)
             {
+                //WindowControl.ShowWindow(Data.FindSystem(CurrentTable).WindowName);
+                //WindowControl.HideTaskbar();
+                //WindowControl.HideCursor();
+                //WindowControl.HideWindow(ProgramName,true);
                 switch (RunMode)
                 {
                     case Mode.FrontEnd:
@@ -430,6 +431,10 @@ namespace PinballFrontEnd.ViewModel
             //PREV KEY
             if (e.KeyPressed == Data.BIND.KEYBIND_PREV)
             {
+                //WindowControl.HideWindow(Data.FindSystem(CurrentTable).WindowName);
+                //WindowControl.ShowTaskbar();
+                //WindowControl.ShowCursor();
+                //WindowControl.ShowWindow(ProgramName,true);
                 switch (RunMode)
                 {
                     case Mode.FrontEnd:
@@ -465,6 +470,9 @@ namespace PinballFrontEnd.ViewModel
             {
                 switch (RunMode)
                 {
+                    case Mode.SystemRunning:
+                        RecordMedia1(); //Use NVIDA shadow play to recorde for 65 seconds.
+                        break;
 
                 }
             }
@@ -486,8 +494,10 @@ namespace PinballFrontEnd.ViewModel
         #region MediaRecording (NOT USED RIGHT NOW)
 
         //Start NVIDIA SHADOW PLAY
-        private void RecordMedia1()
+        private async void RecordMedia1()
         {
+            System.Windows.Forms.SendKeys.SendWait("%{F9}");
+            await Task.Delay(new TimeSpan(0, 1, 5));
             System.Windows.Forms.SendKeys.SendWait("%{F9}");
         }
 
@@ -542,7 +552,7 @@ namespace PinballFrontEnd.ViewModel
             logger.Info($"{RunMode.ToString()} : Loading Thumbnails");
             foreach (PinballTable pt in Data.TableList)
             {
-                pt.loadThumbnails(Data.MediaLocation.ThumbnailResolution);
+                pt.LoadThumbnails(Data.MediaLocation.ThumbnailResolution);
             }
         }
 
@@ -571,11 +581,11 @@ namespace PinballFrontEnd.ViewModel
         {
             BGMusicPlayer.Stop();
             if (CurrentTable != null)
-            if (CurrentTable.BGMusicExists)
-            {
-                BGMusicPlayer.Open(CurrentTable.BGMusic);
-                BGMusicPlayer.Play();
-            }
+                if (CurrentTable.BGMusicExists)
+                {
+                    BGMusicPlayer.Open(CurrentTable.BGMusic);
+                    BGMusicPlayer.Play();
+                }
 
         }
 
@@ -587,8 +597,8 @@ namespace PinballFrontEnd.ViewModel
         private void ResumeBGMusic()
         {
             if (CurrentTable != null)
-            if (CurrentTable.BGMusicExists)
-                BGMusicPlayer.Play();
+                if (CurrentTable.BGMusicExists)
+                    BGMusicPlayer.Play();
         }
 
         #endregion

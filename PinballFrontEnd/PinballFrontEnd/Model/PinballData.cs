@@ -152,6 +152,7 @@ namespace PinballFrontEnd.Model
             return SystemList.Single(x => x.Name == table.System);
         }
 
+
         #region Table Select
 
         //Find the next table in the Table List

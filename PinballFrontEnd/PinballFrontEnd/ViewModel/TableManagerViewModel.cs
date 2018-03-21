@@ -19,6 +19,25 @@ namespace PinballFrontEnd.ViewModel
 {
     public class TableManagerViewModel : ViewModelBase
     {
+
+        string _CurrentExpanded;
+        public string CurrentExpanded
+        {
+            get
+            {
+                return _CurrentExpanded;
+            }
+            set
+            {
+                if (_CurrentExpanded != value)
+                {
+                    _CurrentExpanded = value;
+                    //RaisePropertyChanged("CurrentExpanded");
+                }
+            }
+        }
+
+
         //Setup Class Logger
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -52,6 +71,345 @@ namespace PinballFrontEnd.ViewModel
         // Commands
         public ICommand DummyWindowButton { get { return new RelayCommand(ShowHideDummyWindows); } }
         public ICommand GenerateThumbnailsCommand { get { return new RelayCommand(GenerateThumbnails); } }
+
+
+        #region SelectionChanged
+
+        public ICommand LoadThumbnailCommand { get { return new RelayCommand(GenerateThumbnails); } }
+
+        private void LoadThumbnail(object obj)
+        {
+            SelectedTable.LoadThumbnails(Data.MediaLocation.ThumbnailResolution);
+        }
+
+        #endregion
+
+        #region PreviewMedia
+        //Preview Media
+        public ICommand PreviewPlayfieldCommand { get { return new RelayCommand(PreviewPlayfield); } }
+        public ICommand PreviewBackglassCommand { get { return new RelayCommand(PreviewBackglass); } }
+        public ICommand PreviewDMDCommand { get { return new RelayCommand(PreviewDMD); } }
+        public ICommand PreviewWheelCommand { get { return new RelayCommand(PreviewWheel); } }
+        public ICommand PreviewTableAudioCommand { get { return new RelayCommand(PreviewTableAudio); } }
+        public ICommand PreviewLaunchAudioCommand { get { return new RelayCommand(PreviewLaunchAudio); } }
+
+
+
+        private void PreviewPlayfield(object obj)
+        {
+            if (SelectedTable == null)
+                return;
+            PreviewMusicVideo(SelectedTable.Playfield);
+            SelectedTable.RunAudit();
+        }
+
+        private void PreviewBackglass(object obj)
+        {
+            if (SelectedTable == null)
+                return;
+            PreviewMusicVideo(SelectedTable.Backglass);
+            SelectedTable.RunAudit();
+        }
+
+        private void PreviewDMD(object obj)
+        {
+            if (SelectedTable == null)
+                return;
+            PreviewMusicVideo(SelectedTable.DMD);
+            SelectedTable.RunAudit();
+        }
+
+        private void PreviewWheel(object obj)
+        {
+            if (SelectedTable == null)
+                return;
+            PreviewImage(SelectedTable.Wheel);
+            SelectedTable.RunAudit();
+        }
+
+        private void PreviewTableAudio(object obj)
+        {
+            if (SelectedTable == null)
+                return;
+            PreviewMusicVideo(SelectedTable.BGMusic);
+            SelectedTable.RunAudit();
+        }
+
+        private void PreviewLaunchAudio(object obj)
+        {
+            if (SelectedTable == null)
+                return;
+            PreviewMusicVideo(SelectedTable.LMusic);
+            SelectedTable.RunAudit();
+        }
+
+        private void PreviewMusicVideo(Uri path)
+        {
+            if (File.Exists(path.LocalPath))
+            {
+                var p = new Process();
+                p.StartInfo.FileName = $@"{Properties.Settings.Default.PATH_VLC}\vlc.exe";
+                p.StartInfo.Arguments = $"\"{path.LocalPath}\"";
+                p.Start();
+            }
+        }
+
+        private void PreviewImage(Uri path)
+        {
+            if (File.Exists(path.LocalPath))
+            {
+                var p = new Process();
+                p.StartInfo.FileName = $@"{path.LocalPath}";
+                p.Start();
+            }
+        }
+        #endregion
+
+        #region ImportMedia
+
+        public ICommand GetPlayfieldCommand { get { return new RelayCommand(ImportPlayfield); } }
+        public ICommand GetBackglassCommand { get { return new RelayCommand(ImportBackglass); } }
+        public ICommand GetDMDCommand { get { return new RelayCommand(ImportDMD); } }
+        public ICommand GetWheelCommand { get { return new RelayCommand(ImportWheel); } }
+        public ICommand GetLaunchAudioCommand { get { return new RelayCommand(ImportLaunchAudio); } }
+        public ICommand GetTableAudioCommand { get { return new RelayCommand(ImportTableAudio); } }
+
+        public delegate void MediaImportStartedEventHandler(object source, PinballTable table);
+        public event MediaImportStartedEventHandler MediaImportStarted;
+
+        protected virtual void OnMediaImportStarted(PinballTable table)
+        {
+            MediaImportStarted?.Invoke(this, table);
+        }
+
+        public delegate void MediaImportFinishedEventHandler(object source, PinballTable table);
+        public event MediaImportFinishedEventHandler MediaImportFinished;
+
+        protected virtual void OnMediaImportFinished(PinballTable table)
+        {
+            MediaImportFinished?.Invoke(this, table);
+        }
+
+        private async void ImportPlayfield(object obj)
+        {
+            await Task.Run(() =>
+            {
+                ImportMedia(SelectedTable, ImportMediaType.Playfield, Data.MediaLocation.ConvertOnImport);
+
+                SelectedTable.RunAudit();
+            });
+
+        }
+
+        private async void ImportBackglass(object obj)
+        {
+            await Task.Run(() =>
+            {
+                ImportMedia(SelectedTable, ImportMediaType.Backglass, Data.MediaLocation.ConvertOnImport);
+                SelectedTable.RunAudit();
+            });
+
+        }
+
+        private async void ImportDMD(object obj)
+        {
+            await Task.Run(() =>
+            {
+                ImportMedia(SelectedTable, ImportMediaType.Dmd, Data.MediaLocation.ConvertOnImport);
+                SelectedTable.RunAudit();
+            });
+
+        }
+
+        private async void ImportWheel(object obj)
+        {
+            await Task.Run(() =>
+            {
+                ImportMedia(SelectedTable, ImportMediaType.Wheel);
+                SelectedTable.RunAudit();
+            });
+
+        }
+
+        private async void ImportLaunchAudio(object obj)
+        {
+            await Task.Run(() =>
+            {
+                ImportMedia(SelectedTable, ImportMediaType.LaunchAudio);
+                SelectedTable.RunAudit();
+            });
+
+        }
+
+        private async void ImportTableAudio(object obj)
+        {
+            await Task.Run(() =>
+            {
+                ImportMedia(SelectedTable, ImportMediaType.TableAudio);
+                SelectedTable.RunAudit();
+            });
+
+        }
+
+        private enum ImportFileType
+        {
+            Video,
+            Audio,
+            Image,
+            Any
+        }
+        private enum ImportMediaType
+        {
+            Playfield,
+            Backglass,
+            Dmd,
+            Wheel,
+            LaunchAudio,
+            TableAudio
+        }
+
+        private ImportFileType GetFileType(ImportMediaType mt)
+        {
+            switch (mt)
+            {
+                case ImportMediaType.Playfield:
+                    return ImportFileType.Video;
+                case ImportMediaType.Backglass:
+                    return ImportFileType.Video;
+                case ImportMediaType.Dmd:
+                    return ImportFileType.Video;
+                case ImportMediaType.Wheel:
+                    return ImportFileType.Image;
+                case ImportMediaType.LaunchAudio:
+                    return ImportFileType.Audio;
+                case ImportMediaType.TableAudio:
+                    return ImportFileType.Audio;
+            }
+            return ImportFileType.Any;
+        }
+
+        private string ImportGetSourceFilePath(PinballTable table, ImportFileType type)
+        {
+            switch (type)
+            {
+                case ImportFileType.Video:
+                    return FileUtility.OpenFileDatalogMP4();
+                case ImportFileType.Audio:
+                    return FileUtility.OpenFileDatalogMP3();
+                case ImportFileType.Image:
+                    return FileUtility.OpenFileDatalogPNG();
+            }
+            return null;
+        }
+
+        private string ImportGetDestinationFilePath(PinballTable table, ImportMediaType type)
+        {
+            switch (type)
+            {
+                case ImportMediaType.Playfield:
+                    return table.Playfield.LocalPath;
+                case ImportMediaType.Backglass:
+                    return table.Backglass.LocalPath;
+                case ImportMediaType.Dmd:
+                    return table.DMD.LocalPath;
+                case ImportMediaType.Wheel:
+                    return table.Wheel.LocalPath;
+                case ImportMediaType.LaunchAudio:
+                    return table.LMusic.LocalPath;
+                case ImportMediaType.TableAudio:
+                    return table.LMusic.LocalPath;
+            }
+            return null;
+        }
+
+        private async void ImportMedia(PinballTable table, ImportMediaType type, bool convert = false)
+        {
+            if (table != null)
+                if (table.GetType().Equals(typeof(PinballTable)))
+                {
+                    var tempTable = table; //Store a temp version
+                    OnMediaImportStarted(tempTable); //Raise Event To Stop Videos
+                    var sourceFilePath = ImportGetSourceFilePath(table, GetFileType(type));
+                    var destinationFilePath = ImportGetDestinationFilePath(table, type);
+
+                    //Exit if nothing selected
+                    if (!File.Exists(sourceFilePath))
+                    {
+                        OnMediaImportFinished(tempTable);
+                        return;
+                    }
+
+
+                    //Convert if video
+                    if (convert && GetFileType(type) == ImportFileType.Video)
+                        await Task.Run(() => ImportConvertFile(sourceFilePath, destinationFilePath, type));
+                    else
+                        await Task.Run(() => ImportFile(sourceFilePath, destinationFilePath));
+
+                    OnMediaImportFinished(tempTable); //Raise Event To Start New Videos
+                }
+        }
+
+        private async void ImportConvertFile(string sourcePath, string destinationPath, ImportMediaType type)
+        {
+            //make directory if it doesn't exist
+            FileUtility.CreateDirectory(Path.GetDirectoryName(destinationPath));
+
+            //Only work if source file exists
+            if (File.Exists(sourcePath))
+            {
+                //Rotate for Playfield
+                if (type == ImportMediaType.Playfield)
+                    await Task.Run(() => ImportConvertVideo(sourcePath, destinationPath, ConvertOptions.Rotate180));
+                else
+                    await Task.Run(() => ImportConvertVideo(sourcePath, destinationPath, ConvertOptions.None));
+            }
+        }
+
+        private async void ImportFile(string sourcePath, string destinationPath)
+        {
+            FileUtility.CreateDirectory(Path.GetDirectoryName(destinationPath));
+            if (File.Exists(sourcePath))
+                await Task.Run(() => File.Copy(sourcePath, destinationPath, true));
+        }
+
+        private enum ConvertOptions
+        {
+            None,
+            Rotate180
+        }
+
+        private async void ImportConvertVideo(string sourcePath, string destinationPath, ConvertOptions options)
+        {
+            Process proc = new Process();
+            proc.StartInfo.FileName = $@"{Properties.Settings.Default.PATH_FFMPEG}\bin\ffmpeg.exe";
+            proc.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+
+            switch (options)
+            {
+                case ConvertOptions.Rotate180:
+                    proc.StartInfo.Arguments = $"-y -i \"{sourcePath}\" -c:a copy -vf \"transpose = 2,transpose = 2\" -c:v libx264 -bf 2 -flags +cgop -pix_fmt yuv420p -crf 17 -preset fast -movflags +faststart \"{destinationPath}\"";
+                    break;
+                default:
+                    proc.StartInfo.Arguments = $"-y -i \"{sourcePath}\" -c:a copy -c:v libx264 -bf 2 -flags +cgop -pix_fmt yuv420p -crf 17 -preset fast -movflags +faststart \"{destinationPath}\"";
+                    break;
+            }
+
+            proc.Start();
+            await Task.Run(() => proc.WaitForExit());
+
+        }
+
+        #endregion
+
+        #region Launch Table
+        public ICommand StartTableCommand { get { return new RelayCommand(StartTable); } }
+
+        private void StartTable(object obj)
+        {
+            PinballFunctions.StartTable(Data.FindSystem(SelectedTable), SelectedTable);
+        }
+        #endregion
 
         private void InitalizeDummyWindows()
         {
@@ -96,29 +454,40 @@ namespace PinballFrontEnd.ViewModel
         {
             Process proc = new Process();
             proc.StartInfo.FileName = $@"{Properties.Settings.Default.PATH_FFMPEG}\bin\ffmpeg.exe";
-            proc.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+            proc.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
             foreach (PinballTable pt in Data.TableList)
             {
-                if(pt.PlayfieldExists)
-                {
-                    proc.StartInfo.Arguments = $"-y -i \"{pt.Playfield.LocalPath}\" -vframes 1 -f image2 \"{pt.PlayfieldImage.LocalPath}\"";
-                    proc.Start();
-                    await Task.Run(() => proc.WaitForExit());
-                }
-                if(pt.BackglassExists)
-                {
-                    proc.StartInfo.Arguments = $"-y -i \"{pt.Backglass.LocalPath}\" -vframes 1 -f image2 \"{pt.BackglassImage.LocalPath}\"";
-                    proc.Start();
-                    await Task.Run(() => proc.WaitForExit());
-                }
-                if(pt.DMDExists)
-                {
-                    proc.StartInfo.Arguments = $"-y -i \"{pt.DMD.LocalPath}\" -vframes 1 -f image2 \"{pt.DMDImage.LocalPath}\"";
-                    proc.Start();
-                    await Task.Run(() => proc.WaitForExit());
-                }
-               
+                await Task.Run(() => GenerateThumbnail(pt));
             }
+        }
+
+        private async void GenerateThumbnail(PinballTable table)
+        {
+            Process proc = new Process();
+            proc.StartInfo.FileName = $@"{Properties.Settings.Default.PATH_FFMPEG}\bin\ffmpeg.exe";
+            proc.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
+
+            if (table.PlayfieldExists)
+            {
+                proc.StartInfo.Arguments = $"-y -i \"{table.Playfield.LocalPath}\" -vframes 1 -f image2 \"{table.PlayfieldImage.LocalPath}\"";
+                proc.Start();
+                await Task.Run(() => proc.WaitForExit());
+            }
+            if (table.BackglassExists)
+            {
+                proc.StartInfo.Arguments = $"-y -i \"{table.Backglass.LocalPath}\" -vframes 1 -f image2 \"{table.BackglassImage.LocalPath}\"";
+                proc.Start();
+                await Task.Run(() => proc.WaitForExit());
+            }
+            if (table.DMDExists)
+            {
+                proc.StartInfo.Arguments = $"-y -i \"{table.DMD.LocalPath}\" -vframes 1 -f image2 \"{table.DMDImage.LocalPath}\"";
+                proc.Start();
+                await Task.Run(() => proc.WaitForExit());
+            }
+
+            table.RunAudit();
+
         }
 
         //Show Dummy Windows for location
@@ -128,34 +497,37 @@ namespace PinballFrontEnd.ViewModel
             {
                 PlayfieldWindowDummy.Visibility = Visibility.Hidden;
                 TopMost = false;
-            } else
+            }
+            else
             {
                 PlayfieldWindowDummy.Visibility = Visibility.Visible;
                 TopMost = true;
             }
-                
+
 
             if (BackglassWindowDummy.IsVisible)
             {
                 BackglassWindowDummy.Visibility = Visibility.Hidden;
                 TopMost = false;
-            } else
+            }
+            else
             {
                 BackglassWindowDummy.Visibility = Visibility.Visible;
                 TopMost = true;
             }
-                
+
 
             if (DMDWindowDummy.IsVisible)
             {
                 DMDWindowDummy.Visibility = Visibility.Hidden;
                 TopMost = false;
-            } else
+            }
+            else
             {
                 DMDWindowDummy.Visibility = Visibility.Visible;
                 TopMost = true;
             }
-               
+
         }
 
 
@@ -180,30 +552,7 @@ namespace PinballFrontEnd.ViewModel
         public ICommand SaveTableList { get { return new RelayCommand(SaveTables); } }
         public ICommand OpenTableList { get { return new RelayCommand(OpenTables); } }
 
-        public ICommand Launch { get { return new RelayCommand(LaunchP); } }
-
-       
-
-        private void LaunchP(object obj)
-        {
-            var system = FindSystem(SelectedTable);
-
-
-            var regex = new Regex(@"\[TABLENAME\]");
-            var param = regex.Replace(system.Parameters, SelectedTable.Name);
-
-            regex = new Regex(@"\[SYSTEMPATH\]");
-            param = regex.Replace(param, system.WorkingPath);
-
-            logger.Debug(param);
-            var proc = new Process();
-            proc.StartInfo.FileName = system.WorkingPath + "\\" + system.Executable;
-            proc.StartInfo.Arguments = param;
-            proc.Start();
-            procID = proc.Id;
-            Console.WriteLine(proc.Id);
-
-        }
+        
 
         #region Select Media
 

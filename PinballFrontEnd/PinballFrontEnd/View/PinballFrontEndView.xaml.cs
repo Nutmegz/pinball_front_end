@@ -47,7 +47,6 @@ namespace PinballFrontEnd.View
         {
             InitializeComponent(); //Start WPF Components
 
-
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             // SETUP VLC LIBRARY
             ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,12 +91,8 @@ namespace PinballFrontEnd.View
             //Set to software render
             //RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
 
-            logger.Trace("Loading PinballFrondEndView");
-
-            this.Focus();
-
             //Prevent the PC from going into sleep mode (keep monitors on)
-            PreventSleep();
+            UnManaged.WindowControl.PreventSleep();
         }
 
         /// Controls the playback of the video depending if the window is visible or not
@@ -106,9 +101,13 @@ namespace PinballFrontEnd.View
             var win = (Window)sender;
             if (win.Visibility == Visibility.Visible)
             {
+                Keyboard.Focus(this);
                 //Resume Video
-                sourceProvider.MediaPlayer.Play();
-                this.Focus();
+                if (viewModel.CurrentTable != null)
+                    if (viewModel.CurrentTable.PlayfieldExists)
+                        sourceProvider.MediaPlayer.Play();
+                //while (!Focus()) ;
+                Focus();
             }
             else
             {
@@ -116,13 +115,6 @@ namespace PinballFrontEnd.View
             }
 
 
-        }
-
-        // Keep Main Window Focused
-        private void pfe_LostFocus(object sender, RoutedEventArgs e)
-        {
-            logger.Error("FOCUS LOST SETTING FOCUS");
-            UnManaged.WindowControl.SetFocus("Pinball Front End");
         }
 
         #endregion
@@ -171,13 +163,15 @@ namespace PinballFrontEnd.View
                 catch (Exception)
                 {
                 }
-               
+
                 return;
             }
             //Console.WriteLine("Visibility Timer Tick");
 
             //TestMe.Visibility = Visibility.Visible;
-            PreloadImage.Visibility = Visibility.Hidden;
+            if (viewModel.CurrentTable != null)
+                if (viewModel.CurrentTable.PlayfieldExists)
+                    PreloadImage.Visibility = Visibility.Hidden;
         }
 
         private void VidTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -193,15 +187,15 @@ namespace PinballFrontEnd.View
                 catch (Exception)
                 {
                 }
-                
+
                 return;
             }
 
             //Check to see if playfield video exists before playing.
             //This speeds up the interface vastly
             if (viewModel.CurrentTable != null)
-            if (viewModel.CurrentTable.Playfield != null && viewModel.CurrentTable.PlayfieldExists)
-                sourceProvider.MediaPlayer.Play(viewModel.CurrentTable.Playfield, Model.VlcGlobal.GetVlcArguments());
+                if (viewModel.CurrentTable.Playfield != null && viewModel.CurrentTable.PlayfieldExists)
+                    sourceProvider.MediaPlayer.Play(viewModel.CurrentTable.Playfield, Model.VlcGlobal.GetVlcArguments());
         }
 
         #endregion
@@ -217,46 +211,15 @@ namespace PinballFrontEnd.View
             System.Diagnostics.Process.GetCurrentProcess().Kill();
         }
 
-        #endregion
-
-        #region Power Override
-
-        /////////////////////////////////////////////////////////////////////////////
-        // WINDOWS POWER OVERRIDE
-        /////////////////////////////////////////////////////////////////////////////
-
-        //https://stackoverflow.com/questions/241222/need-to-disable-the-screen-saver-screen-locking-in-windows-c-net
-
-        [FlagsAttribute]
-        public enum EXECUTION_STATE : uint
-        {
-            ES_SYSTEM_REQUIRED = 0x00000001,
-            ES_DISPLAY_REQUIRED = 0x00000002,
-            // Legacy flag, should not be used.
-            // ES_USER_PRESENT   = 0x00000004,
-            ES_AWAYMODE_REQUIRED = 0x00000040,
-            ES_CONTINUOUS = 0x80000000,
-        }
-
-        public static class SleepUtil
-        {
-            [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-            public static extern EXECUTION_STATE SetThreadExecutionState(EXECUTION_STATE esFlags);
-        }
-
-        public void PreventSleep()
-        {
-            if (SleepUtil.SetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS
-                | EXECUTION_STATE.ES_DISPLAY_REQUIRED
-                | EXECUTION_STATE.ES_SYSTEM_REQUIRED
-                | EXECUTION_STATE.ES_AWAYMODE_REQUIRED) == 0) //Away mode for Windows >= Vista
-                SleepUtil.SetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS
-                    | EXECUTION_STATE.ES_DISPLAY_REQUIRED
-                    | EXECUTION_STATE.ES_SYSTEM_REQUIRED); //Windows < Vista, forget away mode
-        }
 
 
         #endregion
 
+        private void pfe_ContentRendered(object sender, EventArgs e)
+        {
+            Focus();
+            UnManaged.WindowControl.LockForground();
+            //viewModel.LockItDown();
+        }
     }
 }

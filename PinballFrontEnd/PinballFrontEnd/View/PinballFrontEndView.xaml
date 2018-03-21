@@ -7,8 +7,9 @@
     xmlns:local="clr-namespace:PinballFrontEnd.View"
     xmlns:Vlc="clr-namespace:Vlc.DotNet.Wpf;assembly=Vlc.DotNet.Wpf"
     mc:Ignorable="d"
-    Title="Pinball Front End"
+    Title="{Binding ProgramName}"
     WindowStartupLocation="Manual"
+    
     WindowStyle="None"
     Width="{Binding Data.MediaLocation.PlayfieldSizeX, Mode=TwoWay,NotifyOnTargetUpdated=True}"
     Height="{Binding Data.MediaLocation.PlayfieldSizeY, Mode=TwoWay,NotifyOnTargetUpdated=True}"
@@ -17,8 +18,9 @@
     Background="Black"
     ResizeMode="NoResize"
     x:Name="pfe"
-    LostFocus="pfe_LostFocus"
     Focusable="True"
+    ContentRendered="pfe_ContentRendered"
+    ShowActivated="True"
     AllowsTransparency="True"
     Topmost="{Binding TopMost}"
     Visibility="{Binding PlayfieldVisibility, Mode=TwoWay, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True}"
@@ -69,7 +71,7 @@
             <RowDefinition
                 Height="*" />
             <RowDefinition
-                Height="5*" />
+                Height="3*" />
             <RowDefinition
                 Height="*" />
             <RowDefinition

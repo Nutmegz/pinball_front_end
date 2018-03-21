@@ -12,6 +12,7 @@ namespace PinballFrontEnd.Model
     {
 
         public String Name { get; set; } = "";
+        public String WindowName { get; set; } = "";
         public String WorkingPath { get; set; } = "";
         public String Executable { get; set; } = "";
         public String Parameters { get; set; } = "";

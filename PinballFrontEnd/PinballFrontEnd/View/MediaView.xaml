@@ -8,6 +8,9 @@
         Title="MediaView"
         x:Name="MediaViewWindow"
         Background="Black"
+        Focusable="False"
+        ShowActivated="False"
+        ShowInTaskbar="False"
         IsVisibleChanged="MediaViewWindow_IsVisibleChanged">
     <Grid>
         <Image 

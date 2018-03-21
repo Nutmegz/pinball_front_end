@@ -11,6 +11,7 @@ namespace PinballFrontEnd.Model
     public class MediaLocation : INotifyPropertyChanged
     {
         public int ThumbnailResolution { get; set; } = 0;
+        public bool ConvertOnImport { get; set; } = true;
 
         public int PlayfieldLocationX { get; set; } = 0;
         public int PlayfieldLocationY { get; set; } = 0;
