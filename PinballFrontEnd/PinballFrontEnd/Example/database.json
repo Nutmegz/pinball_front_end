@@ -1,7 +1,16 @@
 {
   "SystemList": [
     {
+      "Name": "Pinball FX2",
+      "WindowName": "Pinball FX2",
+      "WorkingPath": "C:\\Games\\Steam",
+      "Executable": "Steam.exe",
+      "Parameters": "-applaunch 226980 \"[TABLENAME]\"",
+      "WaitTime": 6
+    },
+    {
       "Name": "Pinball FX3",
+      "WindowName": "Pinball FX3",
       "WorkingPath": "C:\\Games\\Steam",
       "Executable": "Steam.exe",
       "Parameters": "-applaunch 442120 -class \"-table_[TABLENAME]\"",
@@ -9,13 +18,26 @@
     },
     {
       "Name": "VPinballX",
+      "WindowName": "Visual Pinball Player",
       "WorkingPath": "C:\\pinball\\Visual Pinball",
       "Executable": "vpinballx.exe",
       "Parameters": "/play -\"[SYSTEMPATH]\\Tables\\[TABLENAME].vpx\"",
-      "WaitTime": 10
+      "WaitTime": 2
     }
   ],
   "TableList": [
+    {
+      "Name": "Amusement_Park",
+      "Description": "Adventure Land",
+      "Rom": "",
+      "Manufacturer": "",
+      "Year": "",
+      "ShowDMD": false,
+      "ShowBackglass": true,
+      "Enabled": true,
+      "System": "Pinball FX3",
+      "Keywords": ""
+    },
     {
       "Name": "MARVEL_Age_of_Ultron",
       "Description": "Age of Ultron",
@@ -23,7 +45,7 @@
       "Manufacturer": "Zen",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -35,7 +57,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -47,7 +69,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -59,7 +81,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -71,7 +93,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -95,7 +117,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -107,7 +129,19 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
+      "Enabled": true,
+      "System": "Pinball FX3",
+      "Keywords": ""
+    },
+    {
+      "Name": "UNIVERSAL_BTTF",
+      "Description": "Back to the Future",
+      "Rom": "",
+      "Manufacturer": "Zen",
+      "Year": "",
+      "ShowDMD": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -119,7 +153,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -131,7 +165,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -143,7 +177,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -155,7 +189,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -167,7 +201,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -179,7 +213,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -191,7 +225,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -203,7 +237,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -215,7 +249,19 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
+      "Enabled": true,
+      "System": "Pinball FX3",
+      "Keywords": ""
+    },
+    {
+      "Name": "UNIVERSAL_ET",
+      "Description": "E.T.",
+      "Rom": "",
+      "Manufacturer": "Zen",
+      "Year": "",
+      "ShowDMD": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -227,7 +273,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -239,7 +285,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -251,7 +297,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -263,7 +309,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -275,7 +321,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -287,7 +333,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -299,7 +345,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -311,7 +357,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -323,7 +369,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -335,7 +381,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -347,7 +393,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -359,7 +405,55 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
+      "Enabled": true,
+      "System": "Pinball FX3",
+      "Keywords": ""
+    },
+    {
+      "Name": "UNIVERSAL_Jaws",
+      "Description": "Jaws",
+      "Rom": "",
+      "Manufacturer": "Zen",
+      "Year": "",
+      "ShowDMD": false,
+      "ShowBackglass": true,
+      "Enabled": true,
+      "System": "Pinball FX3",
+      "Keywords": ""
+    },
+    {
+      "Name": "UNIVERSAL_Jurassic_Park",
+      "Description": "Jurassic Park",
+      "Rom": "",
+      "Manufacturer": "Zen",
+      "Year": "2018",
+      "ShowDMD": false,
+      "ShowBackglass": true,
+      "Enabled": true,
+      "System": "Pinball FX3",
+      "Keywords": ""
+    },
+    {
+      "Name": "UNIVERSAL_Jurassic_Theme_Park",
+      "Description": "Jurassic Park Pinball Mayham",
+      "Rom": "",
+      "Manufacturer": "Zen",
+      "Year": "2018",
+      "ShowDMD": false,
+      "ShowBackglass": true,
+      "Enabled": true,
+      "System": "Pinball FX3",
+      "Keywords": ""
+    },
+    {
+      "Name": "UNIVERSAL_Jurassic_World",
+      "Description": "Jurassic World",
+      "Rom": "",
+      "Manufacturer": "Zen",
+      "Year": "2018",
+      "ShowDMD": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -371,7 +465,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -383,7 +477,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -395,7 +489,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -407,7 +501,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -419,7 +513,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -431,7 +525,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -443,7 +537,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -455,7 +549,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -467,7 +561,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -479,7 +573,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -491,19 +585,31 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
     },
     {
-      "Name": "MARVEL_Spiderman",
+      "Name": "SouthPark1",
+      "Description": "South Park",
+      "Rom": "",
+      "Manufacturer": "",
+      "Year": "",
+      "ShowDMD": false,
+      "ShowBackglass": true,
+      "Enabled": true,
+      "System": "Pinball FX2",
+      "Keywords": ""
+    },
+    {
+      "Name": "MARVEL_SpiderMan",
       "Description": "Spider-Man",
       "Rom": "",
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -527,7 +633,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -539,7 +645,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -551,7 +657,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -563,7 +669,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -575,7 +681,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -587,7 +693,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -599,7 +705,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -611,7 +717,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -623,31 +729,31 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
     },
     {
-      "Name": "STARWARS_MastersoftheForce",
+      "Name": "STARWARS_Light_VS_Dark",
       "Description": "Star Wars - Masters of the Force",
       "Rom": "",
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
     },
     {
-      "Name": "STARWARS_MightoftheFirstOrder",
+      "Name": "STARWARS_AVCO2",
       "Description": "Star Wars - Might of the First Order",
       "Rom": "",
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -659,19 +765,19 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
     },
     {
-      "Name": "STARWARS_RogueOne",
+      "Name": "STARWARS_LAPB",
       "Description": "Star Wars - Rogue One",
       "Rom": "",
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -683,7 +789,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -695,7 +801,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -707,7 +813,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -719,7 +825,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -731,7 +837,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -743,19 +849,19 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
     },
     {
-      "Name": "WildWestRampage",
+      "Name": "Western",
       "Description": "Wild West Rampage",
       "Rom": "",
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -767,7 +873,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -779,7 +885,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -791,7 +897,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -803,7 +909,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -815,7 +921,7 @@
       "Manufacturer": "",
       "Year": "",
       "ShowDMD": false,
-      "ShowBackglass": false,
+      "ShowBackglass": true,
       "Enabled": true,
       "System": "Pinball FX3",
       "Keywords": ""
@@ -823,6 +929,7 @@
   ],
   "MediaLocation": {
     "ThumbnailResolution": 0,
+    "ConvertOnImport": true,
     "PlayfieldLocationX": 0,
     "PlayfieldLocationY": 0,
     "PlayfieldSizeX": 400,
