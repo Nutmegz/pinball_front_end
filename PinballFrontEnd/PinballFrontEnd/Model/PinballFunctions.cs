@@ -34,6 +34,8 @@ namespace PinballFrontEnd.Model
             var proc = new Process();
             proc.StartInfo.FileName = GetSystemPath(system);
             proc.StartInfo.Arguments = GetSystemParameters(system, table);
+            proc.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
+            proc.StartInfo.CreateNoWindow = true;
             proc.Start();
             return proc;
         }

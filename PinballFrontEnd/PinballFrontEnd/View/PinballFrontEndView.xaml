@@ -99,7 +99,6 @@
             Source="{Binding CurrentTable.PlayfieldThumbnail,
                 NotifyOnSourceUpdated=True,
                 NotifyOnTargetUpdated=True}"
-            TargetUpdated="PreloadImage_SourceUpdated"
             Grid.Column="0"
             Grid.Row="0"
             Grid.ColumnSpan="3"

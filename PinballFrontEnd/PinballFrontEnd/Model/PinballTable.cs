@@ -172,7 +172,7 @@ namespace PinballFrontEnd.Model
             NotifyPropertyChanged(null);
         }
 
-        public void LoadThumbnails(int scale)
+        /*public void LoadThumbnails(int scale)
         {
             try
             {
@@ -194,7 +194,7 @@ namespace PinballFrontEnd.Model
 
                 throw;
             }
-        }
+        }*/
        
 
 

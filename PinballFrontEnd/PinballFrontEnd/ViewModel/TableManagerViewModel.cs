@@ -17,9 +17,9 @@ using System.Windows.Data;
 
 namespace PinballFrontEnd.ViewModel
 {
-    public class TableManagerViewModel : ViewModelBase
+    public class TableManagerViewModel : ViewModelBase, IDisposable
     {
-
+        //allow only one expander to be open at a time
         string _CurrentExpanded;
         public string CurrentExpanded
         {
@@ -41,10 +41,6 @@ namespace PinballFrontEnd.ViewModel
         //Setup Class Logger
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        //public ObservableCollection<PinballSystem> SystemList { get; set; } = new ObservableCollection<PinballSystem>();
-        //public ObservableCollection<PinballTable> TableList { get; set; } = new ObservableCollection<PinballTable>();
-        //public MediaLocation MediaLocation { get; set; } = new MediaLocation();
-
         public PinballSystem SelectedSystem { get; set; }
         public PinballTable SelectedTable { get; set; }
 
@@ -52,14 +48,19 @@ namespace PinballFrontEnd.ViewModel
 
         public PinballData Data { get; set; }
 
+        private string databasepath = "";
+
         public TableManagerViewModel(string databasepath)
         {
-            Data = new PinballData(databasepath);
+            logger.Info($"Starting Table Manager: {databasepath}");
+            this.databasepath = databasepath;
+            Data = new PinballData(this.databasepath);
             InitalizeDummyWindows();
         }
 
         public TableManagerViewModel(PinballData data)
         {
+            logger.Info("Starting Table Manager");
             this.Data = data;
             InitalizeDummyWindows();
         }
@@ -71,18 +72,6 @@ namespace PinballFrontEnd.ViewModel
         // Commands
         public ICommand DummyWindowButton { get { return new RelayCommand(ShowHideDummyWindows); } }
         public ICommand GenerateThumbnailsCommand { get { return new RelayCommand(GenerateThumbnails); } }
-
-
-        #region SelectionChanged
-
-        public ICommand LoadThumbnailCommand { get { return new RelayCommand(GenerateThumbnails); } }
-
-        private void LoadThumbnail(object obj)
-        {
-            SelectedTable.LoadThumbnails(Data.MediaLocation.ThumbnailResolution);
-        }
-
-        #endregion
 
         #region PreviewMedia
         //Preview Media
@@ -411,6 +400,7 @@ namespace PinballFrontEnd.ViewModel
         }
         #endregion
 
+        //windows used to show location where media will be played
         private void InitalizeDummyWindows()
         {
             PlayfieldWindowDummy = new Window();
@@ -486,7 +476,7 @@ namespace PinballFrontEnd.ViewModel
                 await Task.Run(() => proc.WaitForExit());
             }
 
-            table.RunAudit();
+            table.RunAudit(); //update visuals
 
         }
 
@@ -543,173 +533,14 @@ namespace PinballFrontEnd.ViewModel
         }
 
 
-        /*
-        #region Obsolete
-        private int procID;
-
-
-        // Commands
-        public ICommand SaveTableList { get { return new RelayCommand(SaveTables); } }
-        public ICommand OpenTableList { get { return new RelayCommand(OpenTables); } }
-
-        
-
-        #region Select Media
-
-        public ICommand SelectPlayfield { get { return new RelayCommand(SelectPlayfieldFile); } }
-
-        private void SelectPlayfieldFile(object obj)
+        //Clean things up and save database
+        public void Dispose()
         {
-            var filename = GetOpenFile(".mp4", "Media File (*.mp4)|*.mp4");
-            if (filename != null && File.Exists(filename))
-            {
-                //SelectedTable.Playfield = new Uri(filename);
-            }
+            logger.Info("Closing Table Manager");
+            if (databasepath != "")
+                Data.SaveDatabase(databasepath);
+            
         }
 
-        public ICommand SelectBackglass { get { return new RelayCommand(SelectBackglassFile); } }
-
-        private void SelectBackglassFile(object obj)
-        {
-            var filename = GetOpenFile(".mp4", "Media File (*.mp4)|*.mp4");
-            if (filename != null && File.Exists(filename))
-            {
-                //SelectedTable.Backglass = new Uri(filename);
-            }
-        }
-
-        public ICommand SelectDMD { get { return new RelayCommand(SelectDMDFile); } }
-
-        private void SelectDMDFile(object obj)
-        {
-            var filename = GetOpenFile(".mp4", "Media File (*.mp4)|*.mp4");
-            if (filename != null && File.Exists(filename))
-            {
-                //SelectedTable.DMD = new Uri(filename);
-            }
-        }
-
-        public ICommand SelectWheel { get { return new RelayCommand(SelectWheelFile); } }
-
-        private void SelectWheelFile(object obj)
-        {
-            var filename = GetOpenFile(".png", "Media File (*.png)|*.png");
-            if (filename != null && File.Exists(filename))
-            {
-                //SelectedTable.Wheel = new Uri(filename);
-            }
-
-        }
-
-
-        #endregion
-
-        //Save Tables
-        private void SaveTables(object obj)
-        {
-            var filepath = GetSaveFile(".json", "System Database (*.json)|*.json");
-
-            if (filepath != null)
-            {
-                logger.Info("Saving Database: %s", filepath);
-                SortSystemsTables();
-
-                var storedata = new PinballData();
-                storedata.SystemList = SystemList;
-                storedata.TableList = TableList;
-
-                System.IO.File.WriteAllText(filepath, JsonConvert.SerializeObject(storedata, Formatting.Indented));
-            }
-
-
-        }
-
-        private void LoadDatabase()
-        {
-            var databasepath = $"{Model.ProgramPath.Value}database.json";
-            logger.Info($"Loading Database: {databasepath}");
-            //SystemList = JsonConvert.DeserializeObject<ObservableCollection<PinballSystem>>(System.IO.File.ReadAllText(databasepath));
-            PinballData storedata = JsonConvert.DeserializeObject<PinballData>(System.IO.File.ReadAllText(databasepath));
-            SystemList = storedata.SystemList;
-            TableList = storedata.TableList;
-        }
-
-        private void SaveData()
-        {
-            var storedata = new PinballData();
-            storedata.SystemList = SystemList;
-            storedata.TableList = TableList;
-
-
-        }
-
-        private void OpenTables(object obj)
-        {
-            //TableList = JsonConvert.DeserializeObject<ObservableCollection<PinballTable>>(System.IO.File.ReadAllText(GetOpenFile()));
-            var filepath = GetOpenFile(".json", "System Database (*.json)|*.json");
-
-            if (filepath != null && System.IO.File.Exists(filepath))
-            {
-
-
-
-                SystemList = JsonConvert.DeserializeObject<ObservableCollection<PinballSystem>>(System.IO.File.ReadAllText(filepath));
-            }
-
-
-        }
-
-        private void SortSystemsTables()
-        {
-            try
-            {
-
-                foreach (PinballSystem ps in SystemList)
-                {
-                    TableList = new ObservableCollection<PinballTable>(TableList.OrderBy(i => i.Description));
-                }
-
-                SystemList = new ObservableCollection<PinballSystem>(SystemList.OrderBy(i => i.Name));
-
-
-            }
-            catch (Exception e)
-            {
-
-                logger.Error(e.ToString);
-            }
-        }
-
-        private string GetOpenFile(string ext, string filter)
-        {
-            var dlg = new OpenFileDialog();
-            dlg.DefaultExt = ext;
-            dlg.Filter = filter;
-
-            if (dlg.ShowDialog() == true)
-            {
-                var file = new FileInfo(dlg.FileName);
-                return file.FullName;
-            }
-
-            return null;
-        }
-
-        private string GetSaveFile(string ext, string filter)
-        {
-            var dlg = new SaveFileDialog();
-            dlg.DefaultExt = ext;
-            dlg.Filter = filter;
-
-            if (dlg.ShowDialog() == true)
-            {
-                var file = new FileInfo(dlg.FileName);
-                return file.FullName;
-            }
-
-            return null;
-        }
-        #endregion
-        */
     }
 }

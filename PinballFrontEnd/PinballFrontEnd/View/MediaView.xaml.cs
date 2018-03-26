@@ -45,26 +45,31 @@ namespace PinballFrontEnd.View
 
 
 
-        public MediaView()
+        public ViewModel.PinballFrontEndViewModel viewModel { get; set; }
+
+        public MediaView(ViewModel.PinballFrontEndViewModel viewModel)
         {
 
             //this.DataContext = this;
             InitializeComponent();
+            this.viewModel = viewModel;
+            this.DataContext = this.viewModel;
 
+            this.viewModel.TableChanged += ViewModel_TableChanged;
 
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             // SETUP Delay Timers
             ///////////////////////////////////////////////////////////////////////////////////////////////////
 
             //Start Video Update Timer
-            vidTimer = new System.Timers.Timer(1000);
+            vidTimer = new System.Timers.Timer(500);
             vidTimer.Elapsed += VidTimer_Elapsed;
 
             //CurrentSource = new Uri(".");
             vidTimer.AutoReset = false;
             vidTimer.Start();
 
-            showTimer = new System.Timers.Timer(1000);
+            showTimer = new System.Timers.Timer(500);
             showTimer.Elapsed += ShowTimer_Elapsed;
             showTimer.AutoReset = false;
             showTimer.Start();
@@ -76,12 +81,28 @@ namespace PinballFrontEnd.View
             //Create Video Source Provider
             sourceProvider = new VlcVideoSourceProvider(this.Dispatcher);
             sourceProvider.CreatePlayer(Model.VlcGlobal.GetVlcLibrary());
+            sourceProvider.MediaPlayer.Log += ((a, b) => { }); //Do nothing with log
             sourceProvider.MediaPlayer.Playing += MediaPlayer_Playing;
 
             //Bind source provider to image
             VideoImage.SetBinding(Image.SourceProperty, new Binding(nameof(VlcVideoSourceProvider.VideoSource)) { Source = sourceProvider });
         }
 
+        private void ViewModel_TableChanged(object sender, EventArgs e)
+        {
+            //Sync to UI thread
+            if (!CheckAccess())
+            {
+                Dispatcher.Invoke(() => ViewModel_TableChanged(sender, e));
+            }
+
+            VideoImage.Visibility = Visibility.Hidden;
+            PreloadImage.Visibility = Visibility.Visible;
+
+            vidTimer.Stop();
+            vidTimer.Start();
+            showTimer.Stop();
+        }
 
         private void MediaPlayer_Playing(object sender, Vlc.DotNet.Core.VlcMediaPlayerPlayingEventArgs e)
         {
@@ -108,7 +129,11 @@ namespace PinballFrontEnd.View
             //TestMe.Visibility = Visibility.Visible;
             if (MediaUri != null)
                 if (File.Exists(MediaUri.LocalPath))
+                {
+                    VideoImage.Visibility = Visibility.Visible;
                     PreloadImage.Visibility = Visibility.Hidden;
+                }
+                    
         }
 
         private void VidTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -143,15 +168,7 @@ namespace PinballFrontEnd.View
             //vidTimer.
             var im = (Image)sender;
             im.Visibility = Visibility.Visible;
-            Console.WriteLine("Image Changed1");
 
-            //TestMe.Source = viewModel.CurrentTable.Playfield;
-            //CurrentSource = viewModel.CurrentTable.Playfield;
-
-
-            Console.WriteLine("Reset Timer1");
-            //Media.Stop();
-            //Media.Visibility = Visibility.Hidden;
             vidTimer.Stop();
             vidTimer.Start();
 

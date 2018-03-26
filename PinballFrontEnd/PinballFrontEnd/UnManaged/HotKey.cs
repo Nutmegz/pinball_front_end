@@ -11,7 +11,7 @@ using System.Windows.Interop;
 
 //From https://stackoverflow.com/questions/48935/how-can-i-register-a-global-hot-key-to-say-ctrlshiftletter-using-wpf-and-ne
 
-namespace UnManaged
+namespace Nutmegz.UnManaged
 {
     public class HotKey : IDisposable
     {

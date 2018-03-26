@@ -32,8 +32,6 @@
 
         <Image
             x:Name="PreloadImage"
-            TargetUpdated="PreloadImage_SourceUpdated"
-            SourceUpdated="PreloadImage_SourceUpdated"
             Stretch="Fill"
             Visibility="Visible"/>
 

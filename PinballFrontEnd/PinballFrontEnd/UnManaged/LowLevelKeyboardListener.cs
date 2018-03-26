@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
 
-namespace UnManaged
+namespace Nutmegz.UnManaged
 {
     public class LowLevelKeyboardListener
     {

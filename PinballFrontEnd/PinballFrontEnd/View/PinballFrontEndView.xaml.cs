@@ -54,7 +54,9 @@ namespace PinballFrontEnd.View
             //Create Video Source Provider
             sourceProvider = new VlcVideoSourceProvider(this.Dispatcher);
             sourceProvider.CreatePlayer(Model.VlcGlobal.GetVlcLibrary());
+            sourceProvider.MediaPlayer.Log += ((a, b) => { }); //Do nothing with log
             sourceProvider.MediaPlayer.Playing += MediaPlayer_Playing;
+            //sourceProvider.MediaPlayer.VideoOutChanged += MediaPlayer_VideoOutChanged;
 
             //Bind source provider to image
             Playfield.SetBinding(Image.SourceProperty, new Binding(nameof(VlcVideoSourceProvider.VideoSource)) { Source = sourceProvider });
@@ -65,19 +67,21 @@ namespace PinballFrontEnd.View
             viewModel = new PinballFrontEnd.ViewModel.PinballFrontEndViewModel();
             this.DataContext = viewModel;
 
+            viewModel.TableChanged += ViewModel_TableChanged;
+
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             // SETUP Delay Timers
             ///////////////////////////////////////////////////////////////////////////////////////////////////
 
             //Start Video Update Timer
-            vidTimer = new System.Timers.Timer(1000);
+            vidTimer = new System.Timers.Timer(500); //Delays loading of video to allow fast switching
             vidTimer.Elapsed += VidTimer_Elapsed;
 
             //CurrentSource = new Uri(".");
             vidTimer.AutoReset = false;
             vidTimer.Start();
 
-            showTimer = new System.Timers.Timer(1000);
+            showTimer = new System.Timers.Timer(500);
             showTimer.Elapsed += ShowTimer_Elapsed;
             showTimer.AutoReset = false;
             showTimer.Start();
@@ -85,14 +89,28 @@ namespace PinballFrontEnd.View
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             // Other
             ///////////////////////////////////////////////////////////////////////////////////////////////////
-            //Setup Error Logger
-            //AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-
+           
             //Set to software render
             //RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
 
             //Prevent the PC from going into sleep mode (keep monitors on)
-            UnManaged.WindowControl.PreventSleep();
+            Nutmegz.UnManaged.PowerControl.PreventSleep();
+        }
+
+        private void ViewModel_TableChanged(object sender, EventArgs e)
+        {
+            //Sync to UI thread
+            if (!CheckAccess())
+            {
+                Dispatcher.Invoke(() => ViewModel_TableChanged(sender, e));
+            }
+
+            Playfield.Visibility = Visibility.Hidden;
+            PreloadImage.Visibility = Visibility.Visible;
+
+            vidTimer.Stop();
+            vidTimer.Start();
+            showTimer.Stop();
         }
 
         /// Controls the playback of the video depending if the window is visible or not
@@ -119,21 +137,6 @@ namespace PinballFrontEnd.View
 
         #endregion
 
-        #region Preload Image Actions
-
-        //Show new preload image when loaded and start a play video timer
-        private void PreloadImage_SourceUpdated(object sender, DataTransferEventArgs e)
-        {
-            //Get Image Handle
-            var im = (Image)sender;
-            im.Visibility = Visibility.Visible; //Make Preload Image Visiable
-
-            //Reset Video Timer
-            vidTimer.Stop();
-            vidTimer.Start();
-        }
-
-        #endregion
 
         #region MediaPlayer Actions
 
@@ -143,7 +146,6 @@ namespace PinballFrontEnd.View
             //Start Visibility Delay
             showTimer.Stop();
             showTimer.Start();
-            //Console.WriteLine("Playing");
         }
 
         #endregion
@@ -168,10 +170,15 @@ namespace PinballFrontEnd.View
             }
             //Console.WriteLine("Visibility Timer Tick");
 
+            //sourceProvider.MediaPlayer.Play();
             //TestMe.Visibility = Visibility.Visible;
             if (viewModel.CurrentTable != null)
                 if (viewModel.CurrentTable.PlayfieldExists)
+                {
+                    Playfield.Visibility = Visibility.Visible;
                     PreloadImage.Visibility = Visibility.Hidden;
+                }
+                    
         }
 
         private void VidTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -191,6 +198,8 @@ namespace PinballFrontEnd.View
                 return;
             }
 
+            
+
             //Check to see if playfield video exists before playing.
             //This speeds up the interface vastly
             if (viewModel.CurrentTable != null)
@@ -200,25 +209,11 @@ namespace PinballFrontEnd.View
 
         #endregion
 
-        #region Global Error Handling
-
-        //Catch all program errors and log the exception.
-        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            //logger.ErrorException("Fatal Application Error",(System.Exception)e.ExceptionObject);
-            logger.Error((Exception)e.ExceptionObject, "Fatal Application Error");
-            MessageBox.Show("Pinball Front End Fatal Error. Check Log File");
-            System.Diagnostics.Process.GetCurrentProcess().Kill();
-        }
-
-
-
-        #endregion
-
+   
         private void pfe_ContentRendered(object sender, EventArgs e)
         {
             Focus();
-            UnManaged.WindowControl.LockForground();
+            Nutmegz.UnManaged.WindowControl.LockForground();
             //viewModel.LockItDown();
         }
     }

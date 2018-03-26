@@ -80,18 +80,22 @@
 
                 </StackPanel>
 
-                <!-- Your custom content here -->
+                <!--Your custom content here-->
             </Controls:Flyout>
 
         </Controls:FlyoutsControl>
     </Controls:MetroWindow.Flyouts>
 
 
+
     <Window.Resources>
+
+
+
 
         <SolidColorBrush
             x:Key="FileExists"
-            Color="lightGreen" />
+            Color="DarkGray" />
 
 
 
@@ -116,13 +120,24 @@
             x:Key="Title2">16</sys:Double>
 
 
-
+        <!-- Image Button Template-->
         <Style
             x:Key="IconButton"
             TargetType="Button"
             BasedOn="{StaticResource {x:Type Button}}">
 
-
+            <Setter
+                Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Grid>
+                            <ContentPresenter
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <Style
@@ -811,7 +826,6 @@
                         ScrollViewer.CanContentScroll="True"
                         ScrollViewer.VerticalScrollBarVisibility="Auto"
                         ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                        SelectionChanged="TableSelect_SelectionChanged"
                         VerticalAlignment="Top"
                         RowDetailsVisibilityMode="Collapsed"
                         GridLinesVisibility="All"
@@ -833,16 +847,16 @@
                                         <StackPanel
                                             Orientation="Horizontal">
                                             <Button
-                                                Content="{iconPacks:Material Kind=XboxController}" 
+                                                Content="{iconPacks:Material Kind=XboxController}"
                                                 ToolTip="Play"
-                                                Command="{Binding DataContext.StartTableCommand , RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"/>
-                                            <Controls:ToggleSwitch
+                                                Command="{Binding DataContext.StartTableCommand , RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" />
+                                            <CheckBox
                                                 Grid.Row="1"
                                                 Grid.Column="0"
                                                 HorizontalAlignment="Center"
                                                 IsChecked="{Binding Enabled, UpdateSourceTrigger=PropertyChanged}" />
                                         </StackPanel>
-                                      
+
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -883,7 +897,7 @@
                                 SortMemberPath="ShowBackglass">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Controls:ToggleSwitch
+                                        <CheckBox
                                             Grid.Row="1"
                                             Grid.Column="0"
                                             HorizontalAlignment="Center"
@@ -897,7 +911,7 @@
                                 SortMemberPath="ShowDMD">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Controls:ToggleSwitch
+                                        <CheckBox
                                             Grid.Row="1"
                                             Grid.Column="0"
                                             HorizontalAlignment="Center"
@@ -920,6 +934,7 @@
                                             Orientation="Horizontal">
 
                                             <Button
+                                                BorderThickness="0"
                                                 Content="{iconPacks:Material Kind=PlayBoxOutline}"
                                                 Command="{Binding DataContext.PreviewPlayfieldCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
                                                 ToolTip="Preview Playfield Video">
